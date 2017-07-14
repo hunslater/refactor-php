@@ -1,0 +1,23 @@
+#!/usr/bin/env php
+<?php
+
+/**
+ * @author Jan Alfred Richter <falnyr@gmail.com>
+ */
+
+if (!defined('PHP_VERSION_ID') || PHP_VERSION_ID < 70000) {
+    fwrite(STDERR, "PHP needs to be a minimum version of 7.0.0.\n");
+}
+
+set_error_handler(function ($severity, $message, $file, $line) {
+    if ($severity & error_reporting()) {
+        throw new ErrorException($message, 0, $severity, $file, $line);
+    }
+});
+
+require_once __DIR__.'/vendor/autoload.php';
+
+use RefactorPhp\Console\Application;
+
+$application = new Application();
+$application->run();

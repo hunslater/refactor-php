@@ -5,7 +5,8 @@
     "type": "library",
     "require": {
         "php": ">=7.0",
-        "nikic/php-parser": "^3.0"
+        "nikic/php-parser": "^3.0",
+        "symfony/console": "^3.3"
     },
     "require-dev": {
         "phpunit/phpunit": "^6.2"
@@ -16,5 +17,11 @@
             "name": "PHParty",
             "homepage": "http://www.phparty.co.nz/"
         }
-    ]
+    ],
+    "bin": ["refactor-php"],
+    "autoload": {
+        "psr-4": {
+            "RefactorPhp\\": "src/"
+        }
+    }
 }
