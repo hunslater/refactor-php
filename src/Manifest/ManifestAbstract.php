@@ -1,16 +1,8 @@
 <?php
 namespace RefactorPhp\Manifest;
 
-/**
- * Class ManifestAbstract
- * @package RefactorPhp\Manifest
- */
 abstract class ManifestAbstract implements ManifestInterface
 {
-    /**
-     * @var
-     */
-    protected $action;
     /**
      * @var
      */
@@ -19,14 +11,6 @@ abstract class ManifestAbstract implements ManifestInterface
      * @var
      */
     protected $outputPath;
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getAction(): string
-    {
-        return $this->action;
-    }
 
     /**
      * {@inheritdoc}
@@ -43,5 +27,4 @@ abstract class ManifestAbstract implements ManifestInterface
     {
         return $this->outputPath;
     }
-
 }
