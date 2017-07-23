@@ -2,14 +2,13 @@
 
 namespace RefactorPhp\Console;
 
-use PhpCsFixer\Console\Command\DescribeCommand;
-use PhpCsFixer\Console\Command\FixCommand;
-use PhpCsFixer\Console\Command\HelpCommand;
-use PhpCsFixer\Console\Command\ReadmeCommand;
-use PhpCsFixer\Console\Command\SelfUpdateCommand;
-use RefactorPhp\Console\Command\RefactorCommand;
+use RefactorPhp\Console\Command\ManifestCommand;
+use RefactorPhp\Finder;
+use RefactorPhp\Manifest\ManifestReader;
 use Symfony\Component\Console\Application as BaseApplication;
+use Symfony\Component\Console\Command\HelpCommand;
 use Symfony\Component\Console\Command\ListCommand;
+use Symfony\Component\Stopwatch\Stopwatch;
 
 /**
  * @author Jan Alfred Richter <falnyr@gmail.com>
@@ -24,9 +23,15 @@ final class Application extends BaseApplication
     {
         error_reporting(-1);
 
-        parent::__construct('Refactor PHP', self::VERSION);
+        parent::__construct('Refactor', self::VERSION);
 
-        $this->add(new RefactorCommand());
+        $this->add(
+            new ManifestCommand(
+                new ManifestReader(),
+                Finder::create(),
+                new Stopwatch()
+            )
+        );
     }
 
     /**
@@ -34,7 +39,7 @@ final class Application extends BaseApplication
      */
     public function getLongVersion()
     {
-        $version = parent::getLongVersion().' by <comment>PHParty</comment> New Zealand</comment>';
+        $version = parent::getLongVersion().' by <comment>PHParty</comment>';
         $commit = '@git-commit@';
 
         if ('@'.'git-commit@' !== $commit) {
@@ -49,6 +54,9 @@ final class Application extends BaseApplication
      */
     protected function getDefaultCommands()
     {
-        return [new \Symfony\Component\Console\Command\HelpCommand(), new ListCommand()];
+        return [
+            new HelpCommand(),
+            new ListCommand(),
+        ];
     }
 }
