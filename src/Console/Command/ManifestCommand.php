@@ -68,6 +68,13 @@ final class ManifestCommand extends Command
     {
         $verbosity = $output->getVerbosity();
 
+        try {
+            require_once ($manifestFile = $input->getArgument('file'));
+            $manifestClass = basename($manifestFile, '.php');
+            $this->manifestReader->read(new $manifestClass);
+        } catch (\Exception $e) {
+            var_dump($e->getMessage());
+        }
 
         return 0;
     }
