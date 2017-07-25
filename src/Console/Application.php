@@ -4,7 +4,7 @@ namespace RefactorPhp\Console;
 
 use RefactorPhp\Console\Command\ManifestCommand;
 use RefactorPhp\Finder;
-use RefactorPhp\Manifest\ManifestReader;
+use RefactorPhp\Manifest\ManifestResolver;
 use Symfony\Component\Console\Application as BaseApplication;
 use Symfony\Component\Console\Command\HelpCommand;
 use Symfony\Component\Console\Command\ListCommand;
@@ -27,7 +27,6 @@ final class Application extends BaseApplication
 
         $this->add(
             new ManifestCommand(
-                new ManifestReader(),
                 Finder::create(),
                 new Stopwatch()
             )

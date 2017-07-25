@@ -2,7 +2,8 @@
 namespace RefactorPhp\Console\Command;
 
 use RefactorPhp\Finder;
-use RefactorPhp\Manifest\ManifestReader;
+use RefactorPhp\Manifest\ManifestResolver;
+use RefactorPhp\Processor\ProcessorInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -15,11 +16,6 @@ use Symfony\Component\Stopwatch\Stopwatch;
 final class ManifestCommand extends Command
 {
     /**
-     * @var ManifestReader
-     */
-    private $manifestReader;
-
-    /**
      * @var Finder
      */
     private $finder;
@@ -31,15 +27,13 @@ final class ManifestCommand extends Command
 
     /**
      * RefactorCommand constructor.
-     * @param ManifestReader $manifestReader
      * @param Finder $finder
      * @param Stopwatch $stopwatch
      */
-    public function __construct(ManifestReader $manifestReader, Finder $finder, Stopwatch $stopwatch)
+    public function __construct(Finder $finder, Stopwatch $stopwatch)
     {
         parent::__construct();
 
-        $this->manifestReader = $manifestReader;
         $this->finder = $finder;
         $this->stopwatch = $stopwatch;
     }
@@ -71,10 +65,16 @@ final class ManifestCommand extends Command
         try {
             require_once ($manifestFile = $input->getArgument('file'));
             $manifestClass = basename($manifestFile, '.php');
-            $this->manifestReader->read(new $manifestClass);
+            $resolver = new ManifestResolver(new $manifestClass);
+            $processorClass = $resolver->getProcessorClass();
+            /* @var $processor ProcessorInterface */
+            $processor = new $processorClass();
+            dump($processor);
+
         } catch (\Exception $e) {
             var_dump($e->getMessage());
         }
+
 
         return 0;
     }

@@ -2,7 +2,7 @@
 namespace RefactorPhp\Processor;
 
 use PhpParser\NodeVisitor;
-use RefactorPhp\Exception\RefactorException;
+use RefactorPhp\Exception\Exception;
 use RefactorPhp\Exception\RuntimeException;
 use Symfony\Component\Finder\SplFileInfo;
 use Throwable;
@@ -10,7 +10,7 @@ use Throwable;
 /**
  * Class RefactorProcessor.
  */
-class FindProcessor extends Processor implements FileProcessorInterface, RefactorProcessorInterface
+class FindProcessor extends AbstractProcessor implements FileProcessorInterface, RefactorProcessorInterface
 {
     /**
      * @var array
@@ -129,7 +129,7 @@ class FindProcessor extends Processor implements FileProcessorInterface, Refacto
             $contents = $file->getContents();
             $statements = $this->parser->parse($contents);
             $this->traverser->traverse($statements);
-        } catch (RefactorException $e) {
+        } catch (Exception $e) {
             $this->recordException($file, $e);
         } catch (Throwable $e) {
             throw new RuntimeException(
@@ -145,9 +145,9 @@ class FindProcessor extends Processor implements FileProcessorInterface, Refacto
 
     /**
      * @param SplFileInfo       $file
-     * @param RefactorException $e
+     * @param Exception $e
      */
-    protected function recordException(SplFileInfo $file, RefactorException $e)
+    protected function recordException(SplFileInfo $file, Exception $e)
     {
         $this->fileErrors[] = sprintf(
             '%s: %s in %s/%s:%s',

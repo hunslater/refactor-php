@@ -10,7 +10,7 @@ use Symfony\Component\Filesystem\Filesystem;
 /**
  * Class RefactorProcessor.
  */
-class Processor implements ProcessorInterface
+abstract class AbstractProcessor implements ProcessorInterface
 {
     /**
      * @var \PhpParser\Parser

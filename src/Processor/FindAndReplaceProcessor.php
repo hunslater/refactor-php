@@ -1,7 +1,7 @@
 <?php
 namespace RefactorPhp\Processor;
 
-use RefactorPhp\Exception\RefactorException;
+use RefactorPhp\Exception\Exception;
 use RefactorPhp\Exception\RuntimeException;
 use RefactorPhp\Visitor\Schema\RefactorFileVisitor;
 use PhpParser\NodeVisitor;
@@ -40,7 +40,7 @@ class FindAndReplaceProcessor extends FindProcessor
                 $this->fs->dumpFile($this->outputDir.'/'.$file->getRelativePathname(), $code);
             }
 
-        } catch (RefactorException $e) {
+        } catch (Exception $e) {
             $this->recordException($file, $e);
         } catch (Throwable $e) {
             throw new RuntimeException(
