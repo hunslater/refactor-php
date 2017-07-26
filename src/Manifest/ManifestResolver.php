@@ -3,21 +3,10 @@ declare(strict_types=1);
 
 namespace RefactorPhp\Manifest;
 
-use RefactorPhp\Exception\InvalidProcessorException;
-use RefactorPhp\Processor\FindAndReplaceProcessor;
-use RefactorPhp\Processor\FindProcessor;
 use ReflectionClass;
 
 final class ManifestResolver
 {
-    /**
-     * Processor map.
-     */
-    const PROCESSORS = [
-        FindInterface::class            => FindProcessor::class,
-        FindAndReplaceInterface::class  => FindAndReplaceProcessor::class,
-    ];
-
     /**
      * @var ManifestInterface
      */
@@ -34,22 +23,18 @@ final class ManifestResolver
 
     /**
      * @return string
-     * @throws InvalidProcessorException
      */
-    public function getProcessorClass(): string
+    public function getInterface(): string
     {
         $reflection = new ReflectionClass($this->manifest);
         foreach ($reflection->getInterfaces() as $interface) {
-            if (ManifestInterface::class !== ($name = $interface->getName())
-                && array_key_exists($name, self::PROCESSORS)
-            ) {
-                return self::PROCESSORS[$name];
+            if (ManifestInterface::class !== $interface->getName()) {
+                return $interface->getName();
             }
         }
 
-        throw new InvalidProcessorException(
-            "Unable to initialise processor for manifest {$reflection->getName()}."
+        throw new \LogicException(
+            "Provided manifest {$reflection->getName()} is not supported."
         );
     }
-
 }

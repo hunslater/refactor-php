@@ -2,8 +2,7 @@
 namespace RefactorPhp\Console\Command;
 
 use RefactorPhp\Finder;
-use RefactorPhp\Manifest\ManifestResolver;
-use RefactorPhp\Processor\ProcessorInterface;
+use RefactorPhp\Processor\ProcessorFactory;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -60,22 +59,13 @@ final class ManifestCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $verbosity = $output->getVerbosity();
-
         try {
             require_once ($manifestFile = $input->getArgument('file'));
             $manifestClass = basename($manifestFile, '.php');
-            $resolver = new ManifestResolver(new $manifestClass);
-            $processorClass = $resolver->getProcessorClass();
-            /* @var $processor ProcessorInterface */
-            $processor = new $processorClass();
+            $processor = (new ProcessorFactory($output->getVerbosity()))->create(new $manifestClass);
             dump($processor);
-
         } catch (\Exception $e) {
             var_dump($e->getMessage());
         }
-
-
-        return 0;
     }
 }

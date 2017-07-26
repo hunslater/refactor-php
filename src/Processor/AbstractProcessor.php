@@ -2,7 +2,8 @@
 namespace RefactorPhp\Processor;
 
 use PhpParser\NodeTraverser;
-use PhpParser\ParserFactory;
+use PhpParser\NodeTraverserInterface;
+use PhpParser\Parser;
 use PhpParser\PrettyPrinter\Standard;
 use RefactorPhp\Finder;
 use Symfony\Component\Filesystem\Filesystem;
@@ -44,15 +45,26 @@ abstract class AbstractProcessor implements ProcessorInterface
     protected $outputDir;
 
     /**
-     * RefactorProcessor constructor.
+     * AbstractProcessor constructor.
+     * @param Parser $parser
+     * @param NodeTraverserInterface $traverser
+     * @param Standard $prettyPrinter
+     * @param Filesystem $fs
+     * @param Finder $finder
      */
-    public function __construct()
+    public function __construct(
+        Parser $parser,
+        NodeTraverserInterface $traverser,
+        Standard $prettyPrinter,
+        Filesystem $fs,
+        Finder $finder
+    )
     {
-        $this->parser = (new ParserFactory())->create(ParserFactory::PREFER_PHP7);
-        $this->traverser = new NodeTraverser();
-        $this->prettyPrinter = new Standard();
-        $this->fs = new Filesystem();
-        $this->finder = new Finder();
+        $this->parser = $parser;
+        $this->traverser = $traverser;
+        $this->prettyPrinter = $prettyPrinter;
+        $this->fs = $fs;
+        $this->finder = $finder;
     }
 
     /**
