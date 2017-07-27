@@ -62,7 +62,8 @@ final class ManifestCommand extends Command
         try {
             require_once ($manifestFile = $input->getArgument('file'));
             $manifestClass = basename($manifestFile, '.php');
-            $processor = (new ProcessorFactory($output->getVerbosity()))->create(new $manifestClass);
+            $processor = (new ProcessorFactory())->create(new $manifestClass);
+            $processor->setOutput($output);
             dump($processor);
         } catch (\Exception $e) {
             var_dump($e->getMessage());

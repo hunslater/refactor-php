@@ -1,10 +1,9 @@
 <?php
 namespace RefactorPhp\Processor;
 
+use Symfony\Component\Console\Output\OutputInterface;
+
 interface ProcessorInterface
 {
-    public function getSourceDir(): string;
-    public function getOutputDir(): string;
-    public function setSourceDir(string $sourceDir);
-    public function setOutputDir(string $outputDir);
+    public function setOutput(OutputInterface $output);
 }

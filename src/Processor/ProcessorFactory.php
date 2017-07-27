@@ -11,6 +11,7 @@ use RefactorPhp\Manifest\FindAndReplaceInterface;
 use RefactorPhp\Manifest\FindInterface;
 use RefactorPhp\Manifest\ManifestInterface;
 use RefactorPhp\Manifest\ManifestResolver;
+use RefactorPhp\Node\NodeParser;
 use RefactorPhp\Node\NodeTraverser;
 use Symfony\Component\Filesystem\Filesystem;
 
@@ -23,20 +24,6 @@ class ProcessorFactory
         FindInterface::class            => FindProcessor::class,
         FindAndReplaceInterface::class  => FindAndReplaceProcessor::class,
     ];
-
-    /**
-     * @var string
-     */
-    private $verbosity;
-
-    /**
-     * ProcessorFactory constructor.
-     * @param string $verbosity
-     */
-    public function __construct($verbosity)
-    {
-        $this->verbosity = $verbosity;
-    }
 
     /**
      * @param ManifestInterface $manifest
@@ -75,8 +62,7 @@ class ProcessorFactory
     {
         return new FindAndReplaceProcessor(
             Finder::create(),
-            (new ParserFactory())->create(ParserFactory::PREFER_PHP7),
-            new NodeTraverser(),
+            new NodeParser(),
             new Standard(),
             new Filesystem()
         );

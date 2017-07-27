@@ -1,10 +1,9 @@
 <?php
 namespace RefactorPhp\Processor;
 
-use PhpParser\NodeTraverser;
-use PhpParser\NodeTraverserInterface;
-use PhpParser\Parser;
 use RefactorPhp\Finder;
+use RefactorPhp\Node\NodeParser;
+use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * Class RefactorProcessor.
@@ -15,78 +14,33 @@ abstract class AbstractProcessor implements ProcessorInterface
      * @var Finder
      */
     protected $finder;
-    /**
-     * @var \PhpParser\Parser
-     */
-    protected $parser;
-    /**
-     * @var NodeTraverser
-     */
-    protected $traverser;
-    /**
-     * @var string
-     */
-    protected $sourceDir;
 
     /**
-     * @var string
+     * @var NodeParser
      */
-    protected $outputDir;
+    protected $parser;
+
+    /**
+     * @var OutputInterface
+     */
+    protected $output;
 
     /**
      * AbstractProcessor constructor.
      * @param Finder $finder
-     * @param Parser $parser
-     * @param NodeTraverserInterface $traverser
+     * @param NodeParser $parser
      */
-    public function __construct(
-        Finder $finder,
-        Parser $parser,
-        NodeTraverserInterface $traverser
-    )
+    public function __construct(Finder $finder, NodeParser $parser)
     {
         $this->finder = $finder;
         $this->parser = $parser;
-        $this->traverser = $traverser;
     }
 
     /**
-     * @return string
+     * @param OutputInterface $output
      */
-    public function getSourceDir(): string
+    public function setOutput(OutputInterface $output)
     {
-        return $this->sourceDir;
-    }
-
-    /**
-     * @param string $sourceDir
-     *
-     * @return $this
-     */
-    public function setSourceDir(string $sourceDir)
-    {
-        $this->sourceDir = $sourceDir;
-
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getOutputDir(): string
-    {
-        return $this->outputDir;
-    }
-
-    /**
-     * @param string $outputDir
-     *
-     * @return $this
-     */
-    public function setOutputDir(string $outputDir)
-    {
-        $this->outputDir = $outputDir;
-
-        return $this;
+        $this->output = $output;
     }
 }

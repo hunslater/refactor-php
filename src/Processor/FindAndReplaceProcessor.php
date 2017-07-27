@@ -1,15 +1,13 @@
 <?php
 namespace RefactorPhp\Processor;
 
-use PhpParser\NodeTraverserInterface;
-use PhpParser\Parser;
 use PhpParser\PrettyPrinter\Standard;
-use RefactorPhp\Exception\Exception;
 use RefactorPhp\Exception\RuntimeException;
 use RefactorPhp\Finder;
+use RefactorPhp\Node\NodeParser;
 use RefactorPhp\Visitor\Schema\RefactorFileVisitor;
 use PhpParser\NodeVisitor;
-use Symfony\Component\Filesystem\Filesystem;
+use RefactorPhp\Filesystem;
 use Symfony\Component\Finder\SplFileInfo;
 use Throwable;
 
@@ -19,11 +17,6 @@ use Throwable;
 class FindAndReplaceProcessor extends FindProcessor
 {
     /**
-     * @var Standard
-     */
-    protected $standard;
-
-    /**
      * @var Filesystem
      */
     protected $fs;
@@ -31,24 +24,16 @@ class FindAndReplaceProcessor extends FindProcessor
     /**
      * FindAndReplaceProcessor constructor.
      * @param Finder $finder
-     * @param Parser $parser
-     * @param NodeTraverserInterface $traverser
-     * @param Standard $standard
+     * @param NodeParser $parser
      * @param Filesystem $fs
      */
-    public function __construct(
-        Finder $finder,
-        Parser $parser,
-        NodeTraverserInterface $traverser,
-        Standard $standard,
-        Filesystem $fs
-    )
+    public function __construct(Finder $finder, NodeParser $parser, Filesystem $fs)
     {
-        parent::__construct($finder, $parser, $traverser);
+        parent::__construct($finder, $parser);
 
-        $this->standard = $standard;
         $this->fs = $fs;
     }
+
 
     /**
      * @param SplFileInfo $file
