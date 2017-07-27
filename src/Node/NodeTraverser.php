@@ -1,5 +1,5 @@
 <?php
-namespace RefactorPhp;
+namespace RefactorPhp\Node;
 
 use PhpParser\Node;
 use PhpParser\NodeTraverser as BaseNodeTraverser;

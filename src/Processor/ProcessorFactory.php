@@ -11,7 +11,7 @@ use RefactorPhp\Manifest\FindAndReplaceInterface;
 use RefactorPhp\Manifest\FindInterface;
 use RefactorPhp\Manifest\ManifestInterface;
 use RefactorPhp\Manifest\ManifestResolver;
-use RefactorPhp\NodeTraverser;
+use RefactorPhp\Node\NodeTraverser;
 use Symfony\Component\Filesystem\Filesystem;
 
 class ProcessorFactory
@@ -74,11 +74,11 @@ class ProcessorFactory
     private function createFindAndReplaceProcessor(): FindAndReplaceProcessor
     {
         return new FindAndReplaceProcessor(
+            Finder::create(),
             (new ParserFactory())->create(ParserFactory::PREFER_PHP7),
             new NodeTraverser(),
             new Standard(),
-            new Filesystem(),
-            Finder::create()
+            new Filesystem()
         );
     }
 

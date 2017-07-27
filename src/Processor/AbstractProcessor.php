@@ -4,15 +4,17 @@ namespace RefactorPhp\Processor;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeTraverserInterface;
 use PhpParser\Parser;
-use PhpParser\PrettyPrinter\Standard;
 use RefactorPhp\Finder;
-use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * Class RefactorProcessor.
  */
 abstract class AbstractProcessor implements ProcessorInterface
 {
+    /**
+     * @var Finder
+     */
+    protected $finder;
     /**
      * @var \PhpParser\Parser
      */
@@ -21,19 +23,6 @@ abstract class AbstractProcessor implements ProcessorInterface
      * @var NodeTraverser
      */
     protected $traverser;
-    /**
-     * @var Standard
-     */
-    protected $prettyPrinter;
-    /**
-     * @var Filesystem
-     */
-    protected $fs;
-    /**
-     * @var Finder
-     */
-    protected $finder;
-
     /**
      * @var string
      */
@@ -46,25 +35,19 @@ abstract class AbstractProcessor implements ProcessorInterface
 
     /**
      * AbstractProcessor constructor.
+     * @param Finder $finder
      * @param Parser $parser
      * @param NodeTraverserInterface $traverser
-     * @param Standard $prettyPrinter
-     * @param Filesystem $fs
-     * @param Finder $finder
      */
     public function __construct(
+        Finder $finder,
         Parser $parser,
-        NodeTraverserInterface $traverser,
-        Standard $prettyPrinter,
-        Filesystem $fs,
-        Finder $finder
+        NodeTraverserInterface $traverser
     )
     {
+        $this->finder = $finder;
         $this->parser = $parser;
         $this->traverser = $traverser;
-        $this->prettyPrinter = $prettyPrinter;
-        $this->fs = $fs;
-        $this->finder = $finder;
     }
 
     /**
