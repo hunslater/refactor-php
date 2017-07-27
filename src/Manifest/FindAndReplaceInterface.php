@@ -3,7 +3,7 @@ namespace RefactorPhp\Manifest;
 
 use PhpParser\Node;
 
-interface FindAndReplaceInterface
+interface FindAndReplaceInterface extends ManifestInterface
 {
     public function readNode(Node $node): Node;
 }

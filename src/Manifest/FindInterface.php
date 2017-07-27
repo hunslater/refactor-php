@@ -3,7 +3,7 @@ namespace RefactorPhp\Manifest;
 
 use PhpParser\Node;
 
-interface FindInterface
+interface FindInterface extends ManifestInterface
 {
     public function getNodeCondition(Node $node);
 }

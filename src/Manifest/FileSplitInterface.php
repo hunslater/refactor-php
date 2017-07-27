@@ -1,7 +1,7 @@
 <?php
 namespace RefactorPhp\Manifest;
 
-interface FileSplitInterface
+interface FileSplitInterface extends ManifestInterface
 {
 
 }

@@ -6,6 +6,7 @@ namespace RefactorPhp\Processor;
 use LogicException;
 use PhpParser\ParserFactory;
 use PhpParser\PrettyPrinter\Standard;
+use RefactorPhp\Filesystem as RefactorPhpFilesystem;
 use RefactorPhp\Finder;
 use RefactorPhp\Manifest\FindAndReplaceInterface;
 use RefactorPhp\Manifest\FindInterface;
@@ -26,13 +27,18 @@ class ProcessorFactory
     ];
 
     /**
+     * @var ManifestResolver
+     */
+    private $resolver;
+
+    /**
      * @param ManifestInterface $manifest
      * @return ProcessorInterface
      */
     public function create(ManifestInterface $manifest): ProcessorInterface
     {
-        $resolver = new ManifestResolver($manifest);
-        $interface = $resolver->getInterface();
+        $this->resolver = new ManifestResolver($manifest);
+        $interface = $this->resolver->getInterface();
 
         if (array_key_exists($interface, self::PROCESSORS)) {
             $processor = self::PROCESSORS[$interface];
@@ -61,10 +67,12 @@ class ProcessorFactory
     private function createFindAndReplaceProcessor(): FindAndReplaceProcessor
     {
         return new FindAndReplaceProcessor(
-            Finder::create(),
+            $this->resolver->getFinder(),
             new NodeParser(),
-            new Standard(),
-            new Filesystem()
+            new RefactorPhpFilesystem(
+                new Filesystem(),
+                new Standard()
+            )
         );
     }
 
@@ -74,11 +82,8 @@ class ProcessorFactory
     private function createFindProcessor(): FindProcessor
     {
         return new FindProcessor(
-            (new ParserFactory())->create(ParserFactory::PREFER_PHP7),
-            new NodeTraverser(),
-            new Standard(),
-            new Filesystem(),
-            Finder::create()
+            $this->resolver->getFinder(),
+            new NodeParser()
         );
     }
 }

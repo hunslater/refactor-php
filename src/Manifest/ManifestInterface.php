@@ -1,6 +1,8 @@
 <?php
 namespace RefactorPhp\Manifest;
 
+use RefactorPhp\Finder;
+
 /**
  * Interface ManifestInterface
  * @package RefactorPhp\Manifest
@@ -8,14 +10,7 @@ namespace RefactorPhp\Manifest;
 interface ManifestInterface
 {
     /**
-     * Source directories for the code, if there are exclusions, prepend with "!".
-     * @return string|array
+     * @return Finder
      */
-    public function getSourcePath();
-
-    /**
-     * If the resulting code needs to be written elsewhere, define it here.
-     * @return string
-     */
-    public function getOutputPath(): string;
+    public function getFinder(): Finder;
 }

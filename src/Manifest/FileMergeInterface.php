@@ -1,7 +1,7 @@
 <?php
 namespace RefactorPhp\Manifest;
 
-interface FileMergeInterface
+interface FileMergeInterface extends ManifestInterface
 {
 
 }
