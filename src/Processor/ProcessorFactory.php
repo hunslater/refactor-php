@@ -38,7 +38,7 @@ class ProcessorFactory
     public function create(ManifestInterface $manifest): ProcessorInterface
     {
         $this->resolver = new ManifestResolver($manifest);
-        $interface = $this->resolver->getInterface();
+        $interface = $this->resolver->getManifestInterface();
 
         if (array_key_exists($interface, self::PROCESSORS)) {
             $processor = self::PROCESSORS[$interface];

@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace RefactorPhp\Manifest;
 
+use LogicException;
 use RefactorPhp\Exception\NoFilesException;
 use RefactorPhp\Finder;
 use ReflectionClass;
@@ -15,29 +16,43 @@ final class ManifestResolver
     private $manifest;
 
     /**
+     * @var string
+     */
+    private $manifestInterface;
+
+    /**
      * ManifestResolver constructor.
      * @param ManifestInterface $manifest
      */
     public function __construct(ManifestInterface $manifest)
     {
         $this->manifest = $manifest;
+        $this->validate();
+    }
+
+    /**
+     * Validates provided manifest.
+     */
+    public function validate()
+    {
+        $reflection = new ReflectionClass($this->manifest);
+        $this->validateInterface($reflection);
+    }
+
+    /**
+     * @param string $manifestInterface
+     */
+    public function setManifestInterface(string $manifestInterface)
+    {
+        $this->manifestInterface = $manifestInterface;
     }
 
     /**
      * @return string
      */
-    public function getInterface(): string
+    public function getManifestInterface(): string
     {
-        $reflection = new ReflectionClass($this->manifest);
-        foreach ($reflection->getInterfaces() as $interface) {
-            if (in_array(ManifestInterface::class, $interface->getInterfaceNames())) {
-                return $interface->getName();
-            }
-        }
-
-        throw new \LogicException(
-            "Provided manifest {$reflection->getName()} is not supported."
-        );
+        return $this->manifestInterface;
     }
 
     /**
@@ -52,5 +67,22 @@ final class ManifestResolver
         }
 
         return $finder;
+    }
+
+    /**
+     * @param ReflectionClass $reflection
+     */
+    private function validateInterface(ReflectionClass $reflection)
+    {
+        foreach ($reflection->getInterfaces() as $interface) {
+            if (in_array(ManifestInterface::class, $interface->getInterfaceNames())) {
+                $this->setManifestInterface($interface->getName());
+                break;
+            } elseif ($interface->getName() === ManifestInterface::class) {
+                throw new LogicException(
+                    "Cannot use '{$interface->getName()}' directly, implement specific interfaces instead."
+                );
+            }
+        }
     }
 }
