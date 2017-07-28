@@ -14,20 +14,14 @@ class ProcessorFactoryTest extends TestCase
 {
     public function testCreate()
     {
-//        $findAndReplaceInterface = $this->getMockBuilder([
-//            FindAndReplaceInterface::class,
-//        ])->getMock();
+        $findAndReplaceInterface = $this->createMock(FindAndReplaceInterface::class);
+        $findInterface = $this->createMock(FindInterface::class);
 
-//        $findInterface = $this->getMockBuilder([
-//            FindInterface::class,
-//        ])->getMock();
+        $factory = new ProcessorFactory();
+        $findAndReplaceProcessor = $factory->create($findAndReplaceInterface);
+        $findProcessor = $factory->create($findInterface);
 
-//        $factory = new ProcessorFactory();
-//        $findAndReplaceProcessor = $factory->create($findAndReplaceInterface);
-//        $findProcessor = $factory->create($findInterface);
-
-//        $this->assertInstanceOf(FindAndReplaceProcessor::class, $findAndReplaceProcessor);
-//        $this->assertInstanceOf(FindProcessor::class, $findProcessor);
-
+        $this->assertInstanceOf(FindAndReplaceProcessor::class, $findAndReplaceProcessor);
+        $this->assertInstanceOf(FindProcessor::class, $findProcessor);
     }
 }
