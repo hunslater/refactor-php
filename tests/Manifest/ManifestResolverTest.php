@@ -4,6 +4,8 @@ declare(strict_types=1);
 namespace RefactorPhp\Tests\Manifest;
 
 use PHPUnit\Framework\TestCase;
+use RefactorPhp\Exception\NoFilesException;
+use RefactorPhp\Finder;
 use RefactorPhp\Manifest\FindAndReplaceInterface;
 use RefactorPhp\Manifest\FindInterface;
 use RefactorPhp\Manifest\ManifestInterface;
@@ -32,6 +34,22 @@ class ManifestResolverTest extends TestCase
 
         $this->assertAttributeEquals($manifestInterface, 'manifest', $resolver);
         $this->assertSame($interface, $resolver->getManifestInterface());
+    }
+
+    /**
+     * @dataProvider getManifestInterfaces
+     */
+    public function testNoFilesFinder($interface)
+    {
+        $finderMock = $this->createMock(Finder::class);
+        $finderMock->method('count')->willReturn(0);
+
+        $manifestInterface = $this->createMock($interface);
+        $manifestInterface->method('getFinder')->willReturn($finderMock);
+
+        $this->expectException(NoFilesException::class);
+        $resolver = new ManifestResolver($manifestInterface);
+        $resolver->getFinder();
     }
 
     public function getManifestInterfaces()
