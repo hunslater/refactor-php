@@ -64,7 +64,7 @@ final class ManifestCommand extends Command
             $manifestClass = basename($manifestFile, '.php');
             $processor = (new ProcessorFactory())->create(new $manifestClass);
             $processor->setOutput($output);
-            dump($processor);
+            $processor->refactor();
         } catch (\Exception $e) {
             var_dump($e->getMessage());
         }

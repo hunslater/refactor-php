@@ -68,7 +68,10 @@ class ProcessorFactory
     {
         return new FindAndReplaceProcessor(
             $this->resolver->getFinder(),
-            new NodeParser(),
+            new NodeParser(
+                (new ParserFactory())->create(ParserFactory::PREFER_PHP7),
+                new NodeTraverser()
+            ),
             new RefactorPhpFilesystem(
                 new Filesystem(),
                 new Standard()
@@ -83,7 +86,10 @@ class ProcessorFactory
     {
         return new FindProcessor(
             $this->resolver->getFinder(),
-            new NodeParser()
+            new NodeParser(
+                (new ParserFactory())->create(ParserFactory::PREFER_PHP7),
+                new NodeTraverser()
+            )
         );
     }
 }

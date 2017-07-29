@@ -5,6 +5,10 @@ namespace RefactorPhp;
 use PhpParser\PrettyPrinter\Standard;
 use Symfony\Component\Filesystem\Filesystem as BaseFilesystem;
 
+/**
+ * Filesystem decorator.
+ * @package RefactorPhp
+ */
 final class Filesystem
 {
     /**

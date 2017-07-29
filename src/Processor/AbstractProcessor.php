@@ -45,4 +45,9 @@ abstract class AbstractProcessor implements ProcessorInterface
     {
         $this->output = $output;
     }
+
+    public function refactor()
+    {
+        dump($this->output->getVerbosity());
+    }
 }
