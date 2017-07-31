@@ -69,7 +69,8 @@ class ProcessorFactory
             $this->resolver->getFinder(),
             new NodeParser(
                 (new ParserFactory())->create(ParserFactory::PREFER_PHP7),
-                new NodeTraverser($this->resolver->getManifest())
+                new NodeTraverser(),
+                $this->resolver->getManifest()
             ),
             new RefactorPhpFilesystem(
                 new Filesystem(),
@@ -87,7 +88,8 @@ class ProcessorFactory
             $this->resolver->getFinder(),
             new NodeParser(
                 (new ParserFactory())->create(ParserFactory::PREFER_PHP7),
-                new NodeTraverser($this->resolver->getManifest())
+                new NodeTraverser(),
+                $this->resolver->getManifest()
             )
         );
     }

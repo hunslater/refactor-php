@@ -10,21 +10,16 @@ use RefactorPhp\Manifest\ManifestInterface;
 class NodeTraverser extends BaseNodeTraverser
 {
     /**
-     * @var ManifestInterface
+     * @param array $nodes
+     * @param ManifestInterface $manifest
+     * @return bool
      */
-    private $manifest;
-
-    /**
-     * NodeTraverser constructor.
-     * @param $manifest
-     */
-    public function __construct(ManifestInterface $manifest)
+    public function matchesManifest(array $nodes, ManifestInterface $manifest): bool
     {
-        parent::__construct();
+        // TODO: Logic
 
-        $this->manifest = $manifest;
+        return true;
     }
-
 
     /**
      * @param Node[] $nodes

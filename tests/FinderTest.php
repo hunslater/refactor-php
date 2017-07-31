@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace RefactorPhp\Tests\Manifest;
+namespace RefactorPhp\Tests;
 
 use PHPUnit\Framework\TestCase;
 use RefactorPhp\Finder;

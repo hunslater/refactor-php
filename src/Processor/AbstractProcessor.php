@@ -39,13 +39,16 @@ abstract class AbstractProcessor implements ProcessorInterface
     }
 
     /**
-     * @param OutputInterface $output
+     * {@inheritdoc}
      */
     public function setOutput(OutputInterface $output)
     {
         $this->output = $output;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function refactor()
     {
         $this->output->writeln($this->output->getVerbosity());

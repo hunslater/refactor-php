@@ -36,5 +36,6 @@ class FindAndReplaceProcessor extends AbstractProcessor
         foreach ($this->finder as $file) {
             $this->parser->parse($file);
         }
+        print_r(array_keys($this->parser->getMatchingFiles()));
     }
 }
