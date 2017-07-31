@@ -3,9 +3,29 @@ namespace RefactorPhp\Node;
 
 use PhpParser\Node;
 use PhpParser\NodeTraverser as BaseNodeTraverser;
+use RefactorPhp\Manifest\FindAndReplaceInterface;
+use RefactorPhp\Manifest\FindInterface;
+use RefactorPhp\Manifest\ManifestInterface;
 
 class NodeTraverser extends BaseNodeTraverser
 {
+    /**
+     * @var ManifestInterface
+     */
+    private $manifest;
+
+    /**
+     * NodeTraverser constructor.
+     * @param $manifest
+     */
+    public function __construct(ManifestInterface $manifest)
+    {
+        parent::__construct();
+
+        $this->manifest = $manifest;
+    }
+
+
     /**
      * @param Node[] $nodes
      * @return Node[]
@@ -26,6 +46,10 @@ class NodeTraverser extends BaseNodeTraverser
     {
         foreach ($node->getSubNodeNames() as $name) {
             $subNode =& $node->$name;
+
+            if ($this->manifest instanceof FindAndReplaceInterface || $this->manifest instanceof FindInterface) {
+                $this->manifest->getNodeCondition($node);
+            }
 
             if (is_array($subNode)) {
                 $subNode = $this->traverseArray($subNode);

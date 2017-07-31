@@ -70,6 +70,14 @@ final class ManifestResolver
     }
 
     /**
+     * @return ManifestInterface
+     */
+    public function getManifest(): ManifestInterface
+    {
+        return $this->manifest;
+    }
+
+    /**
      * @param ReflectionClass $reflection
      */
     private function validateInterface(ReflectionClass $reflection)

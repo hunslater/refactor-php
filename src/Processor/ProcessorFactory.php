@@ -7,7 +7,6 @@ use LogicException;
 use PhpParser\ParserFactory;
 use PhpParser\PrettyPrinter\Standard;
 use RefactorPhp\Filesystem as RefactorPhpFilesystem;
-use RefactorPhp\Finder;
 use RefactorPhp\Manifest\FindAndReplaceInterface;
 use RefactorPhp\Manifest\FindInterface;
 use RefactorPhp\Manifest\ManifestInterface;
@@ -70,7 +69,7 @@ class ProcessorFactory
             $this->resolver->getFinder(),
             new NodeParser(
                 (new ParserFactory())->create(ParserFactory::PREFER_PHP7),
-                new NodeTraverser()
+                new NodeTraverser($this->resolver->getManifest())
             ),
             new RefactorPhpFilesystem(
                 new Filesystem(),
@@ -88,7 +87,7 @@ class ProcessorFactory
             $this->resolver->getFinder(),
             new NodeParser(
                 (new ParserFactory())->create(ParserFactory::PREFER_PHP7),
-                new NodeTraverser()
+                new NodeTraverser($this->resolver->getManifest())
             )
         );
     }
