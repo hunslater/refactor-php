@@ -29,4 +29,12 @@ class FindAndReplaceProcessor extends AbstractProcessor
 
         $this->fs = $fs;
     }
+
+    public function refactor()
+    {
+        $this->output->writeln($this->output->getVerbosity());
+        foreach ($this->finder as $file) {
+            $this->parser->parse($file);
+        }
+    }
 }

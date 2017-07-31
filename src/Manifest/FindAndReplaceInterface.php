@@ -5,5 +5,6 @@ use PhpParser\Node;
 
 interface FindAndReplaceInterface extends ManifestInterface
 {
-    public function readNode(Node $node): Node;
+    public function getNodeCondition(Node $node);
+    public function getNodeReplacement(Node $node): Node;
 }
