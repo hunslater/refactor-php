@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace RefactorPhp\Node;
 
 use PhpParser\Node;
@@ -10,15 +12,27 @@ use RefactorPhp\Manifest\ManifestInterface;
 class NodeTraverser extends BaseNodeTraverser
 {
     /**
+     * @var bool
+     */
+    protected $isMatch;
+
+    /**
+     * @var ManifestInterface
+     */
+    protected $manifest;
+
+    /**
      * @param array $nodes
      * @param ManifestInterface $manifest
      * @return bool
      */
     public function matchesManifest(array $nodes, ManifestInterface $manifest): bool
     {
-        // TODO: Logic
+        $this->isMatch = false;
+        $this->manifest = $manifest;
+        $this->traverseArray($nodes);
 
-        return true;
+        return $this->isMatch;
     }
 
     /**
@@ -42,10 +56,6 @@ class NodeTraverser extends BaseNodeTraverser
         foreach ($node->getSubNodeNames() as $name) {
             $subNode =& $node->$name;
 
-            if ($this->manifest instanceof FindAndReplaceInterface || $this->manifest instanceof FindInterface) {
-                $this->manifest->getNodeCondition($node);
-            }
-
             if (is_array($subNode)) {
                 $subNode = $this->traverseArray($subNode);
                 if ($this->stopTraversal) {
@@ -57,6 +67,13 @@ class NodeTraverser extends BaseNodeTraverser
                 if ($traverseChildren) {
                     $subNode = $this->traverseNode($subNode);
                     if ($this->stopTraversal) {
+                        break;
+                    }
+                }
+
+                if ($this->manifest instanceof FindAndReplaceInterface || $this->manifest instanceof FindInterface) {
+                    if ($this->manifest->getNodeCondition($node)) {
+                        $this->isMatch = true;
                         break;
                     }
                 }
@@ -85,6 +102,13 @@ class NodeTraverser extends BaseNodeTraverser
                 if ($traverseChildren) {
                     $node = $this->traverseNode($node);
                     if ($this->stopTraversal) {
+                        break;
+                    }
+                }
+
+                if ($this->manifest instanceof FindAndReplaceInterface || $this->manifest instanceof FindInterface) {
+                    if ($this->manifest->getNodeCondition($node)) {
+                        $this->isMatch = true;
                         break;
                     }
                 }
