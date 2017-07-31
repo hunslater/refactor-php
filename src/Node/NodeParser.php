@@ -33,6 +33,7 @@ final class NodeParser implements NodeParserInterface
      * NodeParser constructor.
      * @param Parser $parser
      * @param NodeTraverser $traverser
+     * @param ManifestInterface $manifest
      */
     public function __construct(Parser $parser, NodeTraverser $traverser, ManifestInterface $manifest)
     {

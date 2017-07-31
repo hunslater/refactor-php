@@ -22,29 +22,38 @@ class NodeTraverser extends BaseNodeTraverser
     protected $manifest;
 
     /**
+     * @var array
+     */
+    protected $stack;
+
+    /**
+     * @var Node
+     */
+    protected $prev;
+
+    /**
+     * Resets traverse properties.
+     */
+    private function reset()
+    {
+        $this->prev = null;
+        $this->stack = [];
+        $this->isMatch = false;
+        $this->stopTraversal = false;
+    }
+
+    /**
      * @param array $nodes
      * @param ManifestInterface $manifest
      * @return bool
      */
     public function matchesManifest(array $nodes, ManifestInterface $manifest): bool
     {
-        $this->isMatch = false;
+        $this->reset();
         $this->manifest = $manifest;
         $this->traverseArray($nodes);
 
         return $this->isMatch;
-    }
-
-    /**
-     * @param Node[] $nodes
-     * @return Node[]
-     */
-    public function traverse(array $nodes): array
-    {
-        $this->stopTraversal = false;
-        $nodes = $this->traverseArray($nodes);
-
-        return $nodes;
     }
 
     /**
@@ -58,25 +67,21 @@ class NodeTraverser extends BaseNodeTraverser
 
             if (is_array($subNode)) {
                 $subNode = $this->traverseArray($subNode);
-                if ($this->stopTraversal) {
+                if ($this->stopTraversal || $this->isMatch) {
                     break;
                 }
             } elseif ($subNode instanceof Node) {
-                $traverseChildren = true;
+                $this->createRelations($subNode);
+                $subNode = $this->traverseNode($subNode);
 
-                if ($traverseChildren) {
-                    $subNode = $this->traverseNode($subNode);
-                    if ($this->stopTraversal) {
-                        break;
-                    }
+                if ($this->stopTraversal || $this->isMatch) {
+                    break;
                 }
 
-                if ($this->manifest instanceof FindAndReplaceInterface || $this->manifest instanceof FindInterface) {
-                    if ($this->manifest->getNodeCondition($node)) {
-                        $this->isMatch = true;
-                        break;
-                    }
-                }
+                $this->prev = $node;
+                array_pop($this->stack);
+
+                $this->isMatchingManifest($subNode);
             }
         }
 
@@ -97,21 +102,17 @@ class NodeTraverser extends BaseNodeTraverser
                     break;
                 }
             } elseif ($node instanceof Node) {
-                $traverseChildren = true;
+                $this->createRelations($node);
+                $node = $this->traverseNode($node);
 
-                if ($traverseChildren) {
-                    $node = $this->traverseNode($node);
-                    if ($this->stopTraversal) {
-                        break;
-                    }
+                if ($this->stopTraversal || $this->isMatch) {
+                    break;
                 }
 
-                if ($this->manifest instanceof FindAndReplaceInterface || $this->manifest instanceof FindInterface) {
-                    if ($this->manifest->getNodeCondition($node)) {
-                        $this->isMatch = true;
-                        break;
-                    }
-                }
+                $this->prev = $node;
+                array_pop($this->stack);
+
+                $this->isMatchingManifest($node);
             }
         }
 
@@ -122,5 +123,32 @@ class NodeTraverser extends BaseNodeTraverser
         }
 
         return $nodes;
+    }
+
+    /**
+     * @param Node $node
+     */
+    protected function createRelations(Node $node)
+    {
+        if (!empty($this->stack)) {
+            $node->setAttribute('parent', $this->stack[count($this->stack) - 1]);
+        }
+        if ($this->prev && $this->prev->getAttribute('parent') == $node->getAttribute('parent')) {
+            $node->setAttribute('prev', $this->prev);
+            $this->prev->setAttribute('next', $node);
+        }
+        $this->stack[] = $node;
+    }
+
+    /**
+     * @param Node $node
+     */
+    protected function isMatchingManifest(Node $node)
+    {
+        if ($this->manifest instanceof FindAndReplaceInterface || $this->manifest instanceof FindInterface) {
+            if ($this->manifest->getNodeCondition($node)) {
+                $this->isMatch = true;
+            }
+        }
     }
 }
