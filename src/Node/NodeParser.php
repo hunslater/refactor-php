@@ -2,8 +2,9 @@
 namespace RefactorPhp\Node;
 
 use PhpParser\Parser;
+use Symfony\Component\Finder\SplFileInfo;
 
-final class NodeParser
+final class NodeParser implements NodeParserInterface
 {
     /**
      * @var Parser
@@ -24,5 +25,12 @@ final class NodeParser
     {
         $this->parser = $parser;
         $this->traverser = $traverser;
+    }
+
+    public function parse(SplFileInfo $file)
+    {
+        $contents = $file->getContents();
+        $statements = $this->parser->parse($contents);
+        $statements = $this->traverser->traverse($statements);
     }
 }
