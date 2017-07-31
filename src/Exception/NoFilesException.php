@@ -3,6 +3,7 @@ namespace RefactorPhp\Exception;
 
 use Exception;
 
-class RefactorException extends Exception
+class NoFilesException extends Exception
 {
+
 }

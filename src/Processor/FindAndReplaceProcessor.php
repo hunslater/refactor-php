@@ -1,92 +1,41 @@
 <?php
+declare(strict_types=1);
+
 namespace RefactorPhp\Processor;
 
-use RefactorPhp\Exception\RefactorException;
-use RefactorPhp\Exception\RuntimeException;
-use RefactorPhp\Visitor\Schema\RefactorFileVisitor;
-use PhpParser\NodeVisitor;
-use Symfony\Component\Finder\SplFileInfo;
-use Throwable;
+use RefactorPhp\Finder;
+use RefactorPhp\Node\NodeParser;
+use RefactorPhp\Filesystem;
 
 /**
  * Class RefactorProcessor.
  */
-class FindAndReplaceProcessor extends FindProcessor
+class FindAndReplaceProcessor extends AbstractProcessor
 {
     /**
-     * @var array
+     * @var Filesystem
      */
-    private $visitors = [];
+    protected $fs;
 
     /**
-     * @var int
+     * FindAndReplaceProcessor constructor.
+     * @param Finder $finder
+     * @param NodeParser $parser
+     * @param Filesystem $fs
      */
-    private $processedFiles = 0;
-
-    /**
-     * @param SplFileInfo $file
-     *
-     * @throws RuntimeException
-     */
-    public function processFile(SplFileInfo $file)
+    public function __construct(Finder $finder, NodeParser $parser, Filesystem $fs)
     {
-        try {
-            $contents = $file->getContents();
-            $statements = $this->parser->parse($contents);
-            $statements = $this->traverser->traverse($statements);
+        parent::__construct($finder, $parser);
 
-            if ($this->getRefactoredNodesCount() > 0) {
-                $code = $this->prettyPrinter->prettyPrintFile($statements);
-                $this->fs->dumpFile($this->outputDir.'/'.$file->getRelativePathname(), $code);
-            }
-
-        } catch (RefactorException $e) {
-            $this->recordException($file, $e);
-        } catch (Throwable $e) {
-            throw new RuntimeException(
-                sprintf(
-                    'Error refactoring %s.',
-                    $file->getRelativePathname()
-                ),
-                0,
-                $e
-            );
-        } finally {
-            ++$this->processedFiles;
-            echo sprintf(
-                '%d/%d Completed file: %s with %s modified nodes',
-                $this->processedFiles,
-                $this->fileCount,
-                $file->getRelativePathname(),
-                $this->getRefactoredNodesCount()
-            ).PHP_EOL;
-        }
+        $this->fs = $fs;
     }
 
-    /**
-     * @param NodeVisitor $visitor
-     *
-     * @return $this
-     */
-    public function addVisitor(NodeVisitor $visitor)
+    public function refactor()
     {
-        $this->visitors[] = $visitor;
-        $this->traverser->addVisitor($visitor);
-
-        return $this;
-    }
-
-    /**
-     * @return int
-     */
-    public function getRefactoredNodesCount(): int
-    {
-        $refactoredNodes = 0;
-        foreach ($this->visitors as $visitor) {
-            /** @var $visitor RefactorFileVisitor */
-            $refactoredNodes+= $visitor->getRefactoredNodesCount();
+        $this->output->writeln($this->output->getVerbosity());
+        foreach ($this->finder as $file) {
+            $this->parser->parse($file);
         }
-
-        return $refactoredNodes;
+        print_r(array_keys($this->parser->getMatchingFiles()));
     }
 }
