@@ -1,3 +1,4 @@
+[![Stories in Ready](https://badge.waffle.io/phparty/refactor-php.png?label=ready&title=Ready)](https://waffle.io/phparty/refactor-php?utm_source=badge)
 PHP Refactor tool
 ==========================
 
