@@ -49,6 +49,7 @@ final class NodeParser implements NodeParserInterface
     {
         $contents = $file->getContents();
         $statements = $this->parser->parse($contents);
+        $statements = $this->traverser->traverse($statements);
 
         if ($this->traverser->matchesManifest($statements, $this->manifest)) {
             $this->matchingFiles[$file->getPathname()] = $statements;
