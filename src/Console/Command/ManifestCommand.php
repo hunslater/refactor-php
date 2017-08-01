@@ -60,11 +60,22 @@ final class ManifestCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         try {
+            $this->stopwatch->start(__METHOD__);
+
             require_once ($manifestFile = $input->getArgument('file'));
             $manifestClass = basename($manifestFile, '.php');
             $processor = (new ProcessorFactory())->create(new $manifestClass);
             $processor->setOutput($output);
             $processor->refactor();
+
+            $event = $this->stopwatch->stop(__METHOD__);
+            $output->writeln(
+                sprintf(
+                    "Refactoring complete. Duration: %d seconds. Memory used: %d Mb",
+                    $event->getDuration() / 1000,
+                    $event->getMemory() / 1024 / 1024
+                )
+            );
         } catch (\Exception $e) {
             var_dump($e->getMessage());
         }

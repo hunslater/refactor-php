@@ -63,4 +63,10 @@ final class NodeParser implements NodeParserInterface
     {
         return $this->matchingFiles;
     }
+
+
+    public function refactorMatchingFiles()
+    {
+        // magic
+    }
 }

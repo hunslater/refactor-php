@@ -15,7 +15,12 @@ set_error_handler(function ($severity, $message, $file, $line) {
     }
 });
 
-require_once __DIR__.'/vendor/autoload.php';
+foreach ([__DIR__.'/../../autoload.php', __DIR__.'/vendor/autoload.php'] as $autoloader) {
+    if (file_exists($autoloader)) {
+        require $autoloader;
+        break;
+    }
+}
 
 use RefactorPhp\Console\Application;
 

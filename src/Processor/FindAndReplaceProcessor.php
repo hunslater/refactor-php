@@ -32,10 +32,14 @@ class FindAndReplaceProcessor extends AbstractProcessor
 
     public function refactor()
     {
-        $this->output->writeln($this->output->getVerbosity());
         foreach ($this->finder as $file) {
             $this->parser->parse($file);
         }
-        print_r(array_keys($this->parser->getMatchingFiles()));
+
+        $this->output->writeln(
+            sprintf("Found %d files to Find and Replace.", count($this->parser->getMatchingFiles()))
+        );
+
+        $this->parser->refactorMatchingFiles();
     }
 }
