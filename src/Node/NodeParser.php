@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace RefactorPhp\Node;
 
+use LogicException;
+use PhpParser\Node;
 use PhpParser\Parser;
 use RefactorPhp\Manifest\ManifestInterface;
 use Symfony\Component\Finder\SplFileInfo;
@@ -25,48 +27,48 @@ final class NodeParser implements NodeParserInterface
     private $manifest;
 
     /**
-     * @var array
-     */
-    protected $matchingFiles = [];
-
-    /**
      * NodeParser constructor.
      * @param Parser $parser
      * @param NodeTraverser $traverser
-     * @param ManifestInterface $manifest
      */
-    public function __construct(Parser $parser, NodeTraverser $traverser, ManifestInterface $manifest)
+    public function __construct(Parser $parser, NodeTraverser $traverser)
     {
         $this->parser = $parser;
         $this->traverser = $traverser;
+    }
+
+    /**
+     * @param ManifestInterface $manifest
+     */
+    public function setManifest(ManifestInterface $manifest)
+    {
         $this->manifest = $manifest;
     }
 
     /**
      * @param SplFileInfo $file
+     * @return Node[]
      */
-    public function parse(SplFileInfo $file)
+    public function getFileNodes(SplFileInfo $file): array
     {
         $contents = $file->getContents();
         $statements = $this->parser->parse($contents);
-        $statements = $this->traverser->traverse($statements);
 
-        if ($this->traverser->matchesManifest($statements, $this->manifest)) {
-            $this->matchingFiles[$file->getPathname()] = $statements;
-        }
+        return $this->traverser->traverse($statements);
     }
 
     /**
-     * @return array
+     * Traverses an array of nodes and determines whether it matches current manifest.
+     *
+     * @param Node[] $nodes Array of nodes
+     * @return bool
      */
-    public function getMatchingFiles(): array
+    public function matchesManifest(array $nodes): bool
     {
-        return $this->matchingFiles;
-    }
+        if ( ! $this->manifest instanceof ManifestInterface) {
+            throw new LogicException("Invalid manifest.");
+        }
 
-
-    public function refactorMatchingFiles()
-    {
-        // magic
+        return $this->traverser->matchesManifest($nodes, $this->manifest);
     }
 }

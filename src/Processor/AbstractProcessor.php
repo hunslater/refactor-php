@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace RefactorPhp\Processor;
 
-use RefactorPhp\Finder;
+use RefactorPhp\Manifest\ManifestResolver;
 use RefactorPhp\Node\NodeParser;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -13,9 +13,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 abstract class AbstractProcessor implements ProcessorInterface
 {
     /**
-     * @var Finder
+     * @var ManifestResolver
      */
-    protected $finder;
+    protected $resolver;
 
     /**
      * @var NodeParser
@@ -29,12 +29,12 @@ abstract class AbstractProcessor implements ProcessorInterface
 
     /**
      * AbstractProcessor constructor.
-     * @param Finder $finder
+     * @param ManifestResolver $resolver
      * @param NodeParser $parser
      */
-    public function __construct(Finder $finder, NodeParser $parser)
+    public function __construct(ManifestResolver $resolver, NodeParser $parser)
     {
-        $this->finder = $finder;
+        $this->resolver = $resolver;
         $this->parser = $parser;
     }
 
@@ -52,8 +52,8 @@ abstract class AbstractProcessor implements ProcessorInterface
     public function refactor()
     {
         $this->output->writeln($this->output->getVerbosity());
-        foreach ($this->finder as $file) {
-            $this->parser->parse($file);
+        foreach ($this->resolver->getFinder() as $file) {
+            $this->parser->getFileNodes($file);
         }
     }
 }

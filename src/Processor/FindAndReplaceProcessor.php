@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace RefactorPhp\Processor;
 
-use RefactorPhp\Finder;
+use RefactorPhp\Manifest\ManifestResolver;
 use RefactorPhp\Node\NodeParser;
 use RefactorPhp\Filesystem;
 
@@ -18,28 +18,38 @@ class FindAndReplaceProcessor extends AbstractProcessor
     protected $fs;
 
     /**
+     * @var array
+     */
+    protected $matchingFiles = [];
+
+    /**
      * FindAndReplaceProcessor constructor.
-     * @param Finder $finder
+     * @param ManifestResolver $resolver
      * @param NodeParser $parser
      * @param Filesystem $fs
      */
-    public function __construct(Finder $finder, NodeParser $parser, Filesystem $fs)
+    public function __construct(ManifestResolver $resolver, NodeParser $parser, Filesystem $fs)
     {
-        parent::__construct($finder, $parser);
+        parent::__construct($resolver, $parser);
 
         $this->fs = $fs;
     }
 
     public function refactor()
     {
-        foreach ($this->finder as $file) {
-            $this->parser->parse($file);
+        $this->parser->setManifest($this->resolver->getManifest());
+
+        foreach ($this->resolver->getFinder() as $file) {
+            $nodes = $this->parser->getFileNodes($file);
+            if ($this->parser->matchesManifest($nodes)) {
+                $this->matchingFiles[$file->getPathname()] = $nodes;
+            }
         }
 
         $this->output->writeln(
-            sprintf("Found %d files to Find and Replace.", count($this->parser->getMatchingFiles()))
+            sprintf("Found %d files to Find and Replace.", count($this->matchingFiles))
         );
 
-        $this->parser->refactorMatchingFiles();
+        // TODO: Iterate matching files, replace nodes by condition, save using $fs
     }
 }

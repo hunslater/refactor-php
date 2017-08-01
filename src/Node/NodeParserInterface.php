@@ -7,5 +7,5 @@ use Symfony\Component\Finder\SplFileInfo;
 
 interface NodeParserInterface
 {
-    public function parse(SplFileInfo $file);
+    public function getFileNodes(SplFileInfo $file);
 }

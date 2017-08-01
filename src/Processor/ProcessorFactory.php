@@ -66,11 +66,10 @@ class ProcessorFactory
     private function createFindAndReplaceProcessor(): FindAndReplaceProcessor
     {
         return new FindAndReplaceProcessor(
-            $this->resolver->getFinder(),
+            $this->resolver,
             new NodeParser(
                 (new ParserFactory())->create(ParserFactory::PREFER_PHP7),
-                new NodeTraverser(),
-                $this->resolver->getManifest()
+                new NodeTraverser()
             ),
             new RefactorPhpFilesystem(
                 new Filesystem(),
@@ -85,11 +84,10 @@ class ProcessorFactory
     private function createFindProcessor(): FindProcessor
     {
         return new FindProcessor(
-            $this->resolver->getFinder(),
+            $this->resolver,
             new NodeParser(
                 (new ParserFactory())->create(ParserFactory::PREFER_PHP7),
-                new NodeTraverser(),
-                $this->resolver->getManifest()
+                new NodeTraverser()
             )
         );
     }
