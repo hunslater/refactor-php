@@ -37,11 +37,12 @@ class FindAndReplaceProcessor extends AbstractProcessor
 
     public function refactor()
     {
-        $this->parser->setManifest($this->resolver->getManifest());
+        // TODO: Figure out checking the right manifest, perhaps not passing via resolver?
+        $manifest = $this->resolver->getManifest();
 
         foreach ($this->resolver->getFinder() as $file) {
             $nodes = $this->parser->getFileNodes($file);
-            if ($this->parser->matchesManifest($nodes)) {
+            if ($this->parser->matchesManifest($nodes, $manifest)) {
                 $this->matchingFiles[$file->getPathname()] = $nodes;
             }
         }
@@ -51,5 +52,8 @@ class FindAndReplaceProcessor extends AbstractProcessor
         );
 
         // TODO: Iterate matching files, replace nodes by condition, save using $fs
+        foreach ($this->matchingFiles as $fileName => $nodes) {
+            $nodes = $this->parser->applyManifest($nodes, $manifest);
+        }
     }
 }

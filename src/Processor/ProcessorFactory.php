@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace RefactorPhp\Processor;
 
 use LogicException;
+use PhpParser\NodeTraverser;
 use PhpParser\ParserFactory;
 use PhpParser\PrettyPrinter\Standard;
 use RefactorPhp\Filesystem as RefactorPhpFilesystem;
@@ -12,7 +13,6 @@ use RefactorPhp\Manifest\FindInterface;
 use RefactorPhp\Manifest\ManifestInterface;
 use RefactorPhp\Manifest\ManifestResolver;
 use RefactorPhp\Node\NodeParser;
-use RefactorPhp\Node\NodeTraverser;
 use Symfony\Component\Filesystem\Filesystem;
 
 class ProcessorFactory
