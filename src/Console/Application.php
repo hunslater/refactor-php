@@ -4,7 +4,6 @@ namespace RefactorPhp\Console;
 
 use RefactorPhp\Console\Command\ManifestCommand;
 use RefactorPhp\Finder;
-use RefactorPhp\Manifest\ManifestResolver;
 use Symfony\Component\Console\Application as BaseApplication;
 use Symfony\Component\Console\Command\HelpCommand;
 use Symfony\Component\Console\Command\ListCommand;
@@ -17,7 +16,7 @@ use Symfony\Component\Stopwatch\Stopwatch;
  */
 final class Application extends BaseApplication
 {
-    const VERSION = '0.1.0-DEV';
+    const VERSION = '0.2.0';
 
     public function __construct()
     {

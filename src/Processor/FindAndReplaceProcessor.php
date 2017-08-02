@@ -51,6 +51,7 @@ final class FindAndReplaceProcessor extends AbstractProcessor
         foreach ($this->finder as $file) {
             $nodes = $this->parser->getFileNodes($file);
             if ($this->parser->matchesManifest($nodes, $this->manifest)) {
+                $this->output->writeln("<comment>Found {$file->getFilename()} matches manifest rules.</comment>");
                 $this->matchingFiles[$file->getPathname()] = $nodes;
             }
         }
@@ -59,9 +60,11 @@ final class FindAndReplaceProcessor extends AbstractProcessor
             sprintf("Found %d files to Find and Replace.", count($this->matchingFiles))
         );
 
-        // TODO: Iterate matching files, replace nodes by condition, save using $fs
         foreach ($this->matchingFiles as $fileName => $nodes) {
+            $this->output->writeln("<comment>Applying manifest rules to $fileName...</comment>");
             $nodes = $this->parser->applyManifest($nodes, $this->manifest);
+            $this->fs->saveNodesToFile($nodes, $fileName);
+            $this->output->writeln("Done.");
         }
     }
 }

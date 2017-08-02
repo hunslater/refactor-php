@@ -64,9 +64,16 @@ final class ManifestCommand extends Command
 
             require_once ($manifestFile = $input->getArgument('file'));
             $manifestClass = basename($manifestFile, '.php');
-            $processor = (new ProcessorFactory())->create(new $manifestClass);
-            $processor->setOutput($output);
-            $processor->refactor();
+
+            $output->writeln("<info>Refactoring manifest $manifestClass...</info>");
+
+            try {
+                $processor = (new ProcessorFactory())->create(new $manifestClass);
+                $processor->setOutput($output);
+                $processor->refactor();
+            } catch (\LogicException $e) {
+                $output->writeln('<error>Refactoring unsuccessful: '.$e->getMessage().'</error>');
+            }
 
             $event = $this->stopwatch->stop(__METHOD__);
             $output->writeln(
