@@ -31,4 +31,16 @@ final class Filesystem
         $this->standard = $standard;
     }
 
+    /**
+     * Saves nodes to file.
+     *
+     * @param array $nodes
+     * @param string $filename
+     */
+    public function saveNodesToFile(array $nodes, string $filename)
+    {
+        $code = $this->standard->prettyPrintFile($nodes);
+        $this->fs->dumpFile($filename, $code);
+    }
+
 }

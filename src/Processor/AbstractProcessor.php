@@ -53,7 +53,7 @@ abstract class AbstractProcessor implements ProcessorInterface
     {
         $this->output->writeln($this->output->getVerbosity());
         foreach ($this->finder as $file) {
-            $this->parser->parse($file);
+            $this->parser->getFileNodes($file);
         }
     }
 }

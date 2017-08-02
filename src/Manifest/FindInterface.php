@@ -1,9 +1,7 @@
 <?php
 namespace RefactorPhp\Manifest;
 
-use PhpParser\Node;
-
-interface FindInterface extends ManifestInterface
+interface FindInterface extends NodeManifestInterface
 {
-    public function getNodeCondition(Node $node);
+
 }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace RefactorPhp\Processor;
 
 use LogicException;
+use PhpParser\NodeTraverser;
 use PhpParser\ParserFactory;
 use PhpParser\PrettyPrinter\Standard;
 use RefactorPhp\Filesystem as RefactorPhpFilesystem;
@@ -12,7 +13,6 @@ use RefactorPhp\Manifest\FindInterface;
 use RefactorPhp\Manifest\ManifestInterface;
 use RefactorPhp\Manifest\ManifestResolver;
 use RefactorPhp\Node\NodeParser;
-use RefactorPhp\Node\NodeTraverser;
 use Symfony\Component\Filesystem\Filesystem;
 
 class ProcessorFactory
@@ -69,9 +69,9 @@ class ProcessorFactory
             $this->resolver->getFinder(),
             new NodeParser(
                 (new ParserFactory())->create(ParserFactory::PREFER_PHP7),
-                new NodeTraverser(),
-                $this->resolver->getManifest()
+                new NodeTraverser()
             ),
+            $this->resolver->getManifest(),
             new RefactorPhpFilesystem(
                 new Filesystem(),
                 new Standard()
@@ -88,8 +88,7 @@ class ProcessorFactory
             $this->resolver->getFinder(),
             new NodeParser(
                 (new ParserFactory())->create(ParserFactory::PREFER_PHP7),
-                new NodeTraverser(),
-                $this->resolver->getManifest()
+                new NodeTraverser()
             )
         );
     }

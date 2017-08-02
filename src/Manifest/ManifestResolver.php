@@ -70,7 +70,7 @@ final class ManifestResolver
     }
 
     /**
-     * @return ManifestInterface
+     * @return ManifestInterface|FindInterface|FindAndReplaceInterface|FileMergeInterface|FileSplitInterface
      */
     public function getManifest(): ManifestInterface
     {

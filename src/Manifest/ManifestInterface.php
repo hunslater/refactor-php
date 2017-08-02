@@ -13,4 +13,9 @@ interface ManifestInterface
      * @return Finder
      */
     public function getFinder(): Finder;
+
+    /**
+     * @return float
+     */
+    public function getVersion(): float;
 }

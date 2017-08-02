@@ -3,8 +3,15 @@ declare(strict_types=1);
 
 namespace RefactorPhp\Node;
 
+use PhpParser\Node;
+use PhpParser\NodeTraverser;
+use PhpParser\NodeVisitor;
 use PhpParser\Parser;
-use RefactorPhp\Manifest\ManifestInterface;
+use RefactorPhp\Manifest\FindAndReplaceInterface;
+use RefactorPhp\Manifest\NodeManifestInterface;
+use RefactorPhp\Visitor\ApplyManifestVisitor;
+use RefactorPhp\Visitor\CreateNodeRelationshipVisitor;
+use RefactorPhp\Visitor\MatchesManifestVisitor;
 use Symfony\Component\Finder\SplFileInfo;
 
 final class NodeParser implements NodeParserInterface
@@ -20,45 +27,56 @@ final class NodeParser implements NodeParserInterface
     private $traverser;
 
     /**
-     * @var ManifestInterface
-     */
-    private $manifest;
-
-    /**
-     * @var array
-     */
-    protected $matchingFiles = [];
-
-    /**
      * NodeParser constructor.
      * @param Parser $parser
      * @param NodeTraverser $traverser
      */
-    public function __construct(Parser $parser, NodeTraverser $traverser, ManifestInterface $manifest)
+    public function __construct(Parser $parser, NodeTraverser $traverser)
     {
         $this->parser = $parser;
         $this->traverser = $traverser;
-        $this->manifest = $manifest;
     }
 
     /**
-     * @param SplFileInfo $file
+     * {@inheritdoc}
      */
-    public function parse(SplFileInfo $file)
+    public function getFileNodes(SplFileInfo $file): array
     {
-        $contents = $file->getContents();
-        $statements = $this->parser->parse($contents);
-
-        if ($this->traverser->matchesManifest($statements, $this->manifest)) {
-            $this->matchingFiles[$file->getPathname()] = $statements;
-        }
+        return $this->traverseWithVisitor(
+            $this->parser->parse($file->getContents()),
+            new CreateNodeRelationshipVisitor()
+        );
     }
 
     /**
-     * @return array
+     * {@inheritdoc}
      */
-    public function getMatchingFiles(): array
+    public function matchesManifest(array $nodes, NodeManifestInterface $manifest): bool
     {
-        return $this->matchingFiles;
+        $nodes = $this->traverseWithVisitor($nodes, new MatchesManifestVisitor($manifest));
+
+        return $nodes === MatchesManifestVisitor::MANIFEST_MATCHED;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function applyManifest(array $nodes, FindAndReplaceInterface $manifest): array
+    {
+        return $this->traverseWithVisitor($nodes, new ApplyManifestVisitor($manifest));
+    }
+
+    /**
+     * @param array $nodes
+     * @param NodeVisitor $visitor
+     * @return array|Node[]
+     */
+    private function traverseWithVisitor(array $nodes, NodeVisitor $visitor)
+    {
+        $this->traverser->addVisitor($visitor);
+        $nodes = $this->traverser->traverse($nodes);
+        $this->traverser->removeVisitor($visitor);
+
+        return $nodes;
     }
 }
