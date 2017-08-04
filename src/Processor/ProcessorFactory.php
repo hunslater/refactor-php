@@ -12,6 +12,7 @@ use RefactorPhp\Manifest\FindAndReplaceInterface;
 use RefactorPhp\Manifest\FindInterface;
 use RefactorPhp\Manifest\ManifestInterface;
 use RefactorPhp\Manifest\ManifestResolver;
+use RefactorPhp\Manifest\MergeClassInterface;
 use RefactorPhp\Node\NodeParser;
 use Symfony\Component\Filesystem\Filesystem;
 
@@ -23,6 +24,7 @@ class ProcessorFactory
     const PROCESSORS = [
         FindInterface::class            => FindProcessor::class,
         FindAndReplaceInterface::class  => FindAndReplaceProcessor::class,
+        MergeClassInterface::class      => MergeClassProcessor::class,
     ];
 
     /**
@@ -47,6 +49,9 @@ class ProcessorFactory
                     break;
                 case FindAndReplaceProcessor::class:
                     return $this->createFindAndReplaceProcessor();
+                    break;
+                case MergeClassProcessor::class:
+                    return $this->createMergeClassProcessor();
                     break;
                 default:
                     throw new LogicException(
@@ -89,6 +94,25 @@ class ProcessorFactory
             new NodeParser(
                 (new ParserFactory())->create(ParserFactory::PREFER_PHP7),
                 new NodeTraverser()
+            )
+        );
+    }
+
+    /**
+     * @return MergeClassProcessor
+     */
+    private function createMergeClassProcessor(): MergeClassProcessor
+    {
+        return new MergeClassProcessor(
+            $this->resolver->getFinder(),
+            new NodeParser(
+                (new ParserFactory())->create(ParserFactory::PREFER_PHP7),
+                new NodeTraverser()
+            ),
+            $this->resolver->getManifest(),
+            new RefactorPhpFilesystem(
+                new Filesystem(),
+                new Standard()
             )
         );
     }
