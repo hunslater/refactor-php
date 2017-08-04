@@ -1,7 +1,7 @@
 <?php
 namespace RefactorPhp\Processor;
 
-use PhpParser\Node\Stmt\Class_;
+use RefactorPhp\ClassDescription;
 use RefactorPhp\Filesystem;
 use RefactorPhp\Finder;
 use RefactorPhp\Manifest\MergeClassInterface;
@@ -38,39 +38,52 @@ final class MergeClassProcessor extends AbstractProcessor
     public function refactor()
     {
         foreach ($this->manifest->getClassMap() as $source => $destination) {
-            $resultNodes = $this->parser->mergeClasses(
-                $this->getClassNodes($source),
-                $this->getClassNodes($destination)
-            );
+            $classFrom = $this->parser->getClassDescription($source);
+            $classTo = $this->parser->getClassDescription($destination);
 
-            $this->fs->saveNodesToFile($resultNodes[0], $source);
-            $this->fs->saveNodesToFile($resultNodes[1], $destination);
+            $this->mergeClasses($classFrom, $classTo);
+
+            exit(3);
+
+            $this->fs->saveNodesToFile($classFrom, $source);
+            $this->fs->saveNodesToFile($classTo, $destination);
         }
     }
 
-    /**
-     * @param string $filename
-     * @return array
-     */
-    protected function getClassNodes(string $filename): array
+
+    public function mergeClasses(ClassDescription $source, ClassDescription $destination): array
     {
-        $file = new SplFileInfo($filename, $filename, $filename);
-        $nodes = $this->parser->getFileNodes($file, false);
-
-        if (count($nodes) !== 1) {
-            throw new \LogicException(sprintf(
-                "Provided file %s contains non-class definitions.",
-                basename($filename)
-            ));
+        foreach ($source->getTraits() as $name => $trait) {
+            if ( ! array_key_exists($name, $destination->getTraits())) {
+                $destination->addTrait($trait);
+                $source->removeTrait($trait);
+            }
         }
 
-        if ( ! $nodes[0] instanceof Class_) {
-            throw new \LogicException(sprintf(
-                "Unable to find class definition in %s.",
-                basename($filename)
-            ));
+        foreach ($source->getConstants() as $name => $constant) {
+            if ( ! array_key_exists($name, $destination->getConstants())) {
+                $destination->addConstant($constant);
+                $source->removeConstant($constant);
+            }
         }
 
-        return $nodes;
+        foreach ($source->getProperties() as $name => $property) {
+            if ( ! array_key_exists($name, $destination->getProperties())) {
+                $destination->addProperty($property);
+                $source->removeProperty($property);
+            }
+        }
+
+        foreach ($source->getMethods() as $name => $method) {
+            if ( ! array_key_exists($name, $destination->getMethods())) {
+                $destination->addMethod($method);
+                $source->removeMethod($method);
+            }
+        }
+
+        dump(count($source->getTraits()));
+        dump(count($source->getConstants()));
+        dump(count($source->getProperties()));
+        dump(count($source->getMethods()));
     }
 }

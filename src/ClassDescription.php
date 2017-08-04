@@ -6,24 +6,24 @@ use PhpParser\Node;
 class ClassDescription
 {
     /**
-     * @var Node[]
+     * @var Node\Stmt\TraitUse[]
      */
     private $traits = [];
     /**
-     * @var Node[]
+     * @var Node\Stmt\ClassConst[]
      */
     private $constants = [];
     /**
-     * @var Node[]
+     * @var Node\Stmt\PropertyProperty[]
      */
     private $properties = [];
     /**
-     * @var Node[]
+     * @var Node\Stmt\ClassMethod[]
      */
     private $methods = [];
 
     /**
-     * @return Node[]
+     * @return Node\Stmt\TraitUse[]
      */
     public function getTraits(): array
     {
@@ -31,15 +31,23 @@ class ClassDescription
     }
 
     /**
-     * @param Node $trait
+     * @param Node\Stmt\TraitUse $trait
      */
-    public function addTrait(Node $trait)
+    public function addTrait(Node\Stmt\TraitUse $trait)
     {
-        $this->traits[] = $trait;
+        $this->traits[$trait->traits[0]->getFirst()] = $trait;
     }
 
     /**
-     * @return Node[]
+     * @param Node\Stmt\TraitUse $trait
+     */
+    public function removeTrait(Node\Stmt\TraitUse $trait)
+    {
+        unset($this->traits[$trait->traits[0]->getFirst()]);
+    }
+
+    /**
+     * @return Node\Stmt\ClassConst[]
      */
     public function getConstants(): array
     {
@@ -47,15 +55,23 @@ class ClassDescription
     }
 
     /**
-     * @param Node $constant
+     * @param Node\Stmt\ClassConst $constant
      */
-    public function addConstant(Node $constant)
+    public function addConstant(Node\Stmt\ClassConst $constant)
     {
-        $this->constants[] = $constant;
+        $this->constants[$constant->consts[0]->name] = $constant;
     }
 
     /**
-     * @return Node[]
+     * @param Node\Stmt\ClassConst $constant
+     */
+    public function removeConstant(Node\Stmt\ClassConst $constant)
+    {
+        unset($this->constants[$constant->consts[0]->name]);
+    }
+
+    /**
+     * @return Node\Stmt\PropertyProperty[]
      */
     public function getProperties(): array
     {
@@ -63,15 +79,23 @@ class ClassDescription
     }
 
     /**
-     * @param Node $property
+     * @param Node\Stmt\PropertyProperty $property
      */
-    public function addProperty(Node $property)
+    public function addProperty(Node\Stmt\PropertyProperty $property)
     {
-        $this->properties[] = $property;
+        $this->properties[$property->name] = $property;
     }
 
     /**
-     * @return Node[]
+     * @param Node\Stmt\PropertyProperty $property
+     */
+    public function removeProperty(Node\Stmt\PropertyProperty $property)
+    {
+        unset($this->properties[$property->name]);
+    }
+
+    /**
+     * @return Node\Stmt\ClassMethod[]
      */
     public function getMethods(): array
     {
@@ -79,10 +103,18 @@ class ClassDescription
     }
 
     /**
-     * @param Node $method
+     * @param Node\Stmt\ClassMethod $method
      */
-    public function addMethod(Node $method)
+    public function addMethod(Node\Stmt\ClassMethod $method)
     {
-        $this->methods[] = $method;
+        $this->methods[strtolower($method->name)] = $method;
+    }
+
+    /**
+     * @param Node\Stmt\ClassMethod $method
+     */
+    public function removeMethod(Node\Stmt\ClassMethod $method)
+    {
+        unset($this->methods[strtolower($method->name)]);
     }
 }
