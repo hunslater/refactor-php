@@ -1,6 +1,8 @@
 <?php
 namespace RefactorPhp\Processor;
 
+use PhpParser\BuilderFactory;
+use RefactorPhp\ClassBuilder;
 use RefactorPhp\ClassDescription;
 use RefactorPhp\Filesystem;
 use RefactorPhp\Finder;
@@ -42,17 +44,26 @@ final class MergeClassProcessor extends AbstractProcessor
             $classTo = $this->parser->getClassDescription($destination);
 
             $this->mergeClasses($classFrom, $classTo);
+            $builder = new ClassBuilder(new BuilderFactory());
 
-            exit(3);
+            $classFrom = [$builder->buildFromDescription($classFrom)];
+            $classTo = [$builder->buildFromDescription($classTo)];
 
-            $this->fs->saveNodesToFile($classFrom, $source);
-            $this->fs->saveNodesToFile($classTo, $destination);
+            $this->fs->saveNodesToFile($classFrom, __DIR__.'/../../manifests/'.basename($source));
+            $this->fs->saveNodesToFile($classTo, __DIR__.'/../../manifests/'.basename($source));
         }
     }
 
 
-    public function mergeClasses(ClassDescription $source, ClassDescription $destination): array
+    public function mergeClasses(ClassDescription $source, ClassDescription $destination)
     {
+        foreach ($source->getImplements() as $name => $interface) {
+            if ( ! array_key_exists($name, $destination->getImplements())) {
+                $destination->addImplements($interface);
+                $source->removeImplements($interface);
+            }
+        }
+
         foreach ($source->getTraits() as $name => $trait) {
             if ( ! array_key_exists($name, $destination->getTraits())) {
                 $destination->addTrait($trait);

@@ -6,6 +6,18 @@ use PhpParser\Node;
 class ClassDescription
 {
     /**
+     * @var string
+     */
+    private $name;
+    /**
+     * @var Node\Name
+     */
+    private $extends;
+    /**
+     * @var Node\Name[]
+     */
+    private $implements = [];
+    /**
      * @var Node\Stmt\TraitUse[]
      */
     private $traits = [];
@@ -14,13 +26,69 @@ class ClassDescription
      */
     private $constants = [];
     /**
-     * @var Node\Stmt\PropertyProperty[]
+     * @var Node\Stmt\Property[]
      */
     private $properties = [];
     /**
      * @var Node\Stmt\ClassMethod[]
      */
     private $methods = [];
+
+    /**
+     * @return string
+     */
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+    /**
+     * @param string $name
+     */
+    public function setName(string $name)
+    {
+        $this->name = $name;
+    }
+
+    /**
+     * @return Node\Name
+     */
+    public function getExtends(): Node\Name
+    {
+        return $this->extends;
+    }
+
+    /**
+     * @param Node\Name $extends
+     */
+    public function setExtends(Node\Name $extends)
+    {
+        $this->extends = $extends;
+    }
+
+    /**
+     * @return Node\Name[]
+     */
+    public function getImplements(): array
+    {
+        return $this->implements;
+    }
+
+    /**
+     * @param Node\Name $implements
+     */
+    public function addImplements(Node\Name $implements)
+    {
+        $this->implements[$implements->getFirst()] = $implements;
+    }
+
+    /**
+     * @param Node\Name $implements
+     */
+    public function removeImplements(Node\Name $implements)
+    {
+        unset($this->implements[$implements->getFirst()]);
+    }
 
     /**
      * @return Node\Stmt\TraitUse[]
@@ -71,7 +139,7 @@ class ClassDescription
     }
 
     /**
-     * @return Node\Stmt\PropertyProperty[]
+     * @return Node\Stmt\Property[]
      */
     public function getProperties(): array
     {
@@ -79,19 +147,19 @@ class ClassDescription
     }
 
     /**
-     * @param Node\Stmt\PropertyProperty $property
+     * @param Node\Stmt\Property $property
      */
-    public function addProperty(Node\Stmt\PropertyProperty $property)
+    public function addProperty(Node\Stmt\Property $property)
     {
-        $this->properties[$property->name] = $property;
+        $this->properties[$property->props[0]->name] = $property;
     }
 
     /**
-     * @param Node\Stmt\PropertyProperty $property
+     * @param Node\Stmt\Property $property
      */
-    public function removeProperty(Node\Stmt\PropertyProperty $property)
+    public function removeProperty(Node\Stmt\Property $property)
     {
-        unset($this->properties[$property->name]);
+        unset($this->properties[$property->props[0]->name]);
     }
 
     /**

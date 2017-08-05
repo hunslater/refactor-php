@@ -30,10 +30,16 @@ final class ClassDescriptionVisitor extends NodeVisitorAbstract
      */
     public function leaveNode(Node $node)
     {
-        if ($node instanceof Node\Stmt\ClassMethod) {
+        if ($node instanceof Node\Stmt\Class_) {
+            $this->classDescription->setName($node->name);
+            $this->classDescription->setExtends($node->extends);
+            foreach ($node->implements as $interface) {
+                $this->classDescription->addImplements($interface);
+            }
+        } elseif ($node instanceof Node\Stmt\ClassMethod) {
             $this->classDescription->addMethod($node);
             return NodeTraverser::REMOVE_NODE;
-        } elseif ($node instanceof Node\Stmt\PropertyProperty) {
+        } elseif ($node instanceof Node\Stmt\Property) {
             $this->classDescription->addProperty($node);
             return NodeTraverser::REMOVE_NODE;
         } elseif ($node instanceof Node\Stmt\ClassConst) {
