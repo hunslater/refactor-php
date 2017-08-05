@@ -7,9 +7,11 @@ use PhpParser\Node;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitor;
 use PhpParser\Parser;
+use RefactorPhp\ClassDescription;
 use RefactorPhp\Manifest\FindAndReplaceInterface;
 use RefactorPhp\Manifest\NodeManifestInterface;
 use RefactorPhp\Visitor\ApplyManifestVisitor;
+use RefactorPhp\Visitor\ClassDescriptionVisitor;
 use RefactorPhp\Visitor\CreateNodeRelationshipVisitor;
 use RefactorPhp\Visitor\MatchesManifestVisitor;
 use Symfony\Component\Finder\SplFileInfo;
@@ -40,12 +42,18 @@ final class NodeParser implements NodeParserInterface
     /**
      * {@inheritdoc}
      */
-    public function getFileNodes(SplFileInfo $file): array
+    public function getFileNodes(SplFileInfo $file, bool $withRelationships = true): array
     {
-        return $this->traverseWithVisitor(
-            $this->parser->parse($file->getContents()),
-            new CreateNodeRelationshipVisitor()
-        );
+        if ($withRelationships) {
+            $nodes = $this->traverseWithVisitor(
+                $this->parser->parse($file->getContents()),
+                new CreateNodeRelationshipVisitor()
+            );
+        } else {
+            $nodes = $this->parser->parse($file->getContents());
+        }
+
+        return $nodes;
     }
 
     /**
@@ -78,5 +86,44 @@ final class NodeParser implements NodeParserInterface
         $this->traverser->removeVisitor($visitor);
 
         return $nodes;
+    }
+
+    /**
+     * @param string $filename
+     * @return array
+     */
+    protected function getClassNodes(string $filename): array
+    {
+        $file = new SplFileInfo($filename, $filename, $filename);
+        $nodes = $this->getFileNodes($file, false);
+
+        if (count($nodes) !== 1) {
+            throw new \LogicException(sprintf(
+                "Provided file %s contains non-class definitions.",
+                basename($filename)
+            ));
+        }
+
+        if ( ! $nodes[0] instanceof Node\Stmt\Class_) {
+            throw new \LogicException(sprintf(
+                "Unable to find class definition in %s.",
+                basename($filename)
+            ));
+        }
+
+        return $nodes;
+    }
+
+    /**
+     * @param string $filename
+     * @return ClassDescription
+     */
+    public function getClassDescription(string $filename): ClassDescription
+    {
+        $nodes = $this->getClassNodes($filename);
+        $description = new ClassDescription();
+        $this->traverseWithVisitor($nodes, new ClassDescriptionVisitor($description));
+
+        return $description;
     }
 }

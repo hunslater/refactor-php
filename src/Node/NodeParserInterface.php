@@ -14,9 +14,10 @@ interface NodeParserInterface
      * Returns traversed list of nodes with relationships to each other.
      *
      * @param SplFileInfo $file
-     * @return Node[]
+     * @param bool $withRelationships
+     * @return array
      */
-    public function getFileNodes(SplFileInfo $file): array;
+    public function getFileNodes(SplFileInfo $file, bool $withRelationships = true): array;
 
     /**
      * Checks if nodes match provided manifest.
