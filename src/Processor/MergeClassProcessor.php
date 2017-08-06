@@ -1,14 +1,11 @@
 <?php
 namespace RefactorPhp\Processor;
 
-use PhpParser\BuilderFactory;
 use RefactorPhp\ClassBuilder;
 use RefactorPhp\ClassDescription;
 use RefactorPhp\Filesystem;
-use RefactorPhp\Finder;
 use RefactorPhp\Manifest\MergeClassInterface;
 use RefactorPhp\Node\NodeParser;
-use Symfony\Component\Finder\SplFileInfo;
 
 final class MergeClassProcessor extends AbstractProcessor
 {
@@ -23,18 +20,24 @@ final class MergeClassProcessor extends AbstractProcessor
     protected $fs;
 
     /**
+     * @var ClassBuilder
+     */
+    protected $builder;
+
+    /**
      * MergeClassProcessor constructor.
-     * @param Finder $finder
      * @param NodeParser $parser
      * @param MergeClassInterface $manifest
      * @param Filesystem $fs
+     * @param ClassBuilder $builder
      */
-    public function __construct(Finder $finder, NodeParser $parser, MergeClassInterface $manifest, Filesystem $fs)
+    public function __construct(NodeParser $parser, MergeClassInterface $manifest, Filesystem $fs, ClassBuilder $builder)
     {
-        parent::__construct($finder, $parser);
+        parent::__construct($parser);
 
         $this->manifest = $manifest;
         $this->fs = $fs;
+        $this->builder = $builder;
     }
 
     public function refactor()
@@ -44,17 +47,20 @@ final class MergeClassProcessor extends AbstractProcessor
             $classTo = $this->parser->getClassDescription($destination);
 
             $this->mergeClasses($classFrom, $classTo);
-            $builder = new ClassBuilder(new BuilderFactory());
 
-            $classFrom = [$builder->buildFromDescription($classFrom)];
-            $classTo = [$builder->buildFromDescription($classTo)];
+            $classFrom = [$this->builder->buildFromDescription($classFrom)];
+            $classTo = [$this->builder->buildFromDescription($classTo)];
 
+            // Temporary path
             $this->fs->saveNodesToFile($classFrom, __DIR__.'/../../manifests/'.basename($source));
-            $this->fs->saveNodesToFile($classTo, __DIR__.'/../../manifests/'.basename($source));
+            $this->fs->saveNodesToFile($classTo, __DIR__.'/../../manifests/'.basename($destination));
         }
     }
 
-
+    /**
+     * @param ClassDescription $source
+     * @param ClassDescription $destination
+     */
     public function mergeClasses(ClassDescription $source, ClassDescription $destination)
     {
         foreach ($source->getImplements() as $name => $interface) {
@@ -92,6 +98,7 @@ final class MergeClassProcessor extends AbstractProcessor
             }
         }
 
+        dump("--- DUPLICATES ---");
         dump(count($source->getTraits()));
         dump(count($source->getConstants()));
         dump(count($source->getProperties()));
