@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace RefactorPhp\Manifest;
 
 use PhpParser\Node;
+use RefactorPhp\Finder;
 
 interface NodeManifestInterface extends ManifestInterface
 {
@@ -14,4 +15,9 @@ interface NodeManifestInterface extends ManifestInterface
      * @return bool
      */
     public function getNodeCondition(Node $node): bool;
+
+    /**
+     * @return Finder
+     */
+    public function getFinder(): Finder;
 }
