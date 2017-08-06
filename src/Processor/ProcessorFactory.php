@@ -4,9 +4,11 @@ declare(strict_types=1);
 namespace RefactorPhp\Processor;
 
 use LogicException;
+use PhpParser\BuilderFactory;
 use PhpParser\NodeTraverser;
 use PhpParser\ParserFactory;
 use PhpParser\PrettyPrinter\Standard;
+use RefactorPhp\ClassBuilder;
 use RefactorPhp\Filesystem as RefactorPhpFilesystem;
 use RefactorPhp\Manifest\FindAndReplaceInterface;
 use RefactorPhp\Manifest\FindInterface;
@@ -71,11 +73,11 @@ class ProcessorFactory
     private function createFindAndReplaceProcessor(): FindAndReplaceProcessor
     {
         return new FindAndReplaceProcessor(
-            $this->resolver->getFinder(),
             new NodeParser(
                 (new ParserFactory())->create(ParserFactory::PREFER_PHP7),
                 new NodeTraverser()
             ),
+            $this->resolver->getFinder(),
             $this->resolver->getManifest(),
             new RefactorPhpFilesystem(
                 new Filesystem(),
@@ -90,11 +92,12 @@ class ProcessorFactory
     private function createFindProcessor(): FindProcessor
     {
         return new FindProcessor(
-            $this->resolver->getFinder(),
             new NodeParser(
                 (new ParserFactory())->create(ParserFactory::PREFER_PHP7),
                 new NodeTraverser()
-            )
+            ),
+            $this->resolver->getFinder(),
+            $this->resolver->getManifest()
         );
     }
 
@@ -104,7 +107,6 @@ class ProcessorFactory
     private function createMergeClassProcessor(): MergeClassProcessor
     {
         return new MergeClassProcessor(
-            $this->resolver->getFinder(),
             new NodeParser(
                 (new ParserFactory())->create(ParserFactory::PREFER_PHP7),
                 new NodeTraverser()
@@ -113,6 +115,9 @@ class ProcessorFactory
             new RefactorPhpFilesystem(
                 new Filesystem(),
                 new Standard()
+            ),
+            new ClassBuilder(
+                new BuilderFactory()
             )
         );
     }

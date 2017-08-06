@@ -29,16 +29,22 @@ final class FindAndReplaceProcessor extends AbstractProcessor
     protected $matchingFiles = [];
 
     /**
+     * @var Finder
+     */
+    protected $finder;
+
+    /**
      * FindAndReplaceProcessor constructor.
-     * @param Finder $finder
      * @param NodeParser $parser
+     * @param Finder $finder
      * @param FindAndReplaceInterface $manifest
      * @param Filesystem $fs
      */
-    public function __construct(Finder $finder, NodeParser $parser, FindAndReplaceInterface $manifest, Filesystem $fs)
+    public function __construct(NodeParser $parser, Finder $finder, FindAndReplaceInterface $manifest, Filesystem $fs)
     {
-        parent::__construct($finder, $parser);
+        parent::__construct($parser);
 
+        $this->finder = $finder;
         $this->manifest = $manifest;
         $this->fs = $fs;
     }
