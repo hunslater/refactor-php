@@ -6,6 +6,8 @@ use RefactorPhp\ClassDescription;
 use RefactorPhp\Filesystem;
 use RefactorPhp\Manifest\MergeClassInterface;
 use RefactorPhp\Node\NodeParser;
+use RefactorPhp\Visitor\MergeExistingMethodVisitor;
+use RefactorPhp\Visitor\MergeUniqueMethodVisitor;
 
 final class MergeClassProcessor extends AbstractProcessor
 {
@@ -71,44 +73,34 @@ final class MergeClassProcessor extends AbstractProcessor
     public function mergeClasses(ClassDescription $source, ClassDescription $destination)
     {
         foreach ($source->getImplements() as $name => $interface) {
-            if ( ! array_key_exists($name, $destination->getImplements())) {
-                $destination->addImplements($interface);
-                $source->removeImplements($interface);
-            }
+            $destination->addImplements($interface);
+            $source->removeImplements($interface);
         }
 
         foreach ($source->getTraits() as $name => $trait) {
-            if ( ! array_key_exists($name, $destination->getTraits())) {
-                $destination->addTrait($trait);
-                $source->removeTrait($trait);
-            }
+            $destination->addTrait($trait);
+            $source->removeTrait($trait);
         }
 
         foreach ($source->getConstants() as $name => $constant) {
-            if ( ! array_key_exists($name, $destination->getConstants())) {
-                $destination->addConstant($constant);
-                $source->removeConstant($constant);
-            }
+            $destination->addConstant($constant);
+            $source->removeConstant($constant);
         }
 
         foreach ($source->getProperties() as $name => $property) {
-            if ( ! array_key_exists($name, $destination->getProperties())) {
-                $destination->addProperty($property);
-                $source->removeProperty($property);
-            }
+            $destination->addProperty($property);
+            $source->removeProperty($property);
         }
 
         foreach ($source->getMethods() as $name => $method) {
             if ( ! array_key_exists($name, $destination->getMethods())) {
+                $this->parser->traverseWithVisitor([$method], new MergeUniqueMethodVisitor());
                 $destination->addMethod($method);
                 $source->removeMethod($method);
+            } else {
+                $this->parser->traverseWithVisitor([$method], new MergeExistingMethodVisitor());
+                $this->output->writeln("<info>$name</info> will need refactoring manually.");
             }
         }
-
-        dump("--- DUPLICATES ---");
-        dump(count($source->getTraits()));
-        dump(count($source->getConstants()));
-        dump(count($source->getProperties()));
-        dump(count($source->getMethods()));
     }
 }

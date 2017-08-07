@@ -75,11 +75,11 @@ final class NodeParser implements NodeParserInterface
     }
 
     /**
-     * @param array $nodes
+     * @param array Node[]
      * @param NodeVisitor $visitor
      * @return array|Node[]
      */
-    private function traverseWithVisitor(array $nodes, NodeVisitor $visitor)
+    public function traverseWithVisitor(array $nodes, NodeVisitor $visitor)
     {
         $this->traverser->addVisitor($visitor);
         $nodes = $this->traverser->traverse($nodes);
