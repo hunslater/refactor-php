@@ -43,6 +43,11 @@ final class MergeClassProcessor extends AbstractProcessor
     public function refactor()
     {
         foreach ($this->manifest->getClassMap() as $source => $destination) {
+            $this->output->writeln(sprintf(
+                "Merging <comment>%s</comment> to <comment>%s</comment>...",
+                basename($source),
+                basename($destination)
+            ));
             $classFrom = $this->parser->getClassDescription($source);
             $classTo = $this->parser->getClassDescription($destination);
 
@@ -52,8 +57,10 @@ final class MergeClassProcessor extends AbstractProcessor
             $classTo = [$this->builder->buildFromDescription($classTo)];
 
             // Temporary path
-            $this->fs->saveNodesToFile($classFrom, __DIR__.'/../../manifests/'.basename($source));
-            $this->fs->saveNodesToFile($classTo, __DIR__.'/../../manifests/'.basename($destination));
+            $this->fs->saveNodesToFile($classFrom, $source);
+            $this->output->writeln("Saved file <comment>$source</comment>.");
+            $this->fs->saveNodesToFile($classTo, $destination);
+            $this->output->writeln("Saved file <comment>$destination</comment>.");
         }
     }
 
