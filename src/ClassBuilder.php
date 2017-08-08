@@ -41,7 +41,6 @@ final class ClassBuilder
         }
 
         $class
-            ->addStmts($description->getTraits())
             ->addStmts($description->getConstants())
             ->addStmts($description->getProperties())
             ->addStmts($description->getMethods());

@@ -77,11 +77,6 @@ final class MergeClassProcessor extends AbstractProcessor
             $source->removeImplements($interface);
         }
 
-        foreach ($source->getTraits() as $name => $trait) {
-            $destination->addTrait($trait);
-            $source->removeTrait($trait);
-        }
-
         foreach ($source->getConstants() as $name => $constant) {
             $destination->addConstant($constant);
             $source->removeConstant($constant);
