@@ -6,7 +6,7 @@ use RefactorPhp\ClassDescription;
 use RefactorPhp\Filesystem;
 use RefactorPhp\Manifest\MergeClassInterface;
 use RefactorPhp\Node\NodeParser;
-use RefactorPhp\Visitor\MergeExistingMethodVisitor;
+use RefactorPhp\Visitor\MergeExtractedMethodVisitor;
 use RefactorPhp\Visitor\MergeUniqueMethodVisitor;
 
 final class MergeClassProcessor extends AbstractProcessor
@@ -89,12 +89,17 @@ final class MergeClassProcessor extends AbstractProcessor
 
         foreach ($source->getMethods() as $name => $method) {
             if ( ! array_key_exists($name, $destination->getMethods())) {
-                $this->parser->traverseWithVisitor([$method], new MergeUniqueMethodVisitor());
+//                $this->parser->traverseWithVisitor([$method], new MergeUniqueMethodVisitor($source, $destination));
                 $destination->addMethod($method);
                 $source->removeMethod($method);
             } else {
-                $this->parser->traverseWithVisitor([$method], new MergeExistingMethodVisitor());
-                $this->output->writeln("<info>$name</info> will need refactoring manually.");
+                $extractedMethod = $destination->getMethods()[$name];
+                $destination->removeMethod($method);
+                $this->parser->traverseWithVisitor([$extractedMethod], new MergeExtractedMethodVisitor());
+                $destination->addMethod($extractedMethod);
+
+                $destination->addMethod($method);
+                $source->removeMethod($method);
             }
         }
     }
