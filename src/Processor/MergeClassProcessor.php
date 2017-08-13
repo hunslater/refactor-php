@@ -3,6 +3,7 @@ namespace RefactorPhp\Processor;
 
 use RefactorPhp\ClassBuilder;
 use RefactorPhp\ClassDescription;
+use RefactorPhp\ClassMerger;
 use RefactorPhp\Filesystem;
 use RefactorPhp\Manifest\MergeClassInterface;
 use RefactorPhp\Node\NodeParser;
@@ -25,6 +26,10 @@ final class MergeClassProcessor extends AbstractProcessor
      * @var ClassBuilder
      */
     protected $builder;
+    /**
+     * @var ClassMerger
+     */
+    private $merger;
 
     /**
      * MergeClassProcessor constructor.
@@ -32,14 +37,22 @@ final class MergeClassProcessor extends AbstractProcessor
      * @param MergeClassInterface $manifest
      * @param Filesystem $fs
      * @param ClassBuilder $builder
+     * @param ClassMerger $merger
      */
-    public function __construct(NodeParser $parser, MergeClassInterface $manifest, Filesystem $fs, ClassBuilder $builder)
+    public function __construct(
+        NodeParser $parser,
+        MergeClassInterface $manifest,
+        Filesystem $fs,
+        ClassBuilder $builder,
+        ClassMerger $merger
+    )
     {
         parent::__construct($parser);
 
         $this->manifest = $manifest;
         $this->fs = $fs;
         $this->builder = $builder;
+        $this->merger = $merger;
     }
 
     public function refactor()
@@ -53,6 +66,7 @@ final class MergeClassProcessor extends AbstractProcessor
             $classFrom = $this->parser->getClassDescription($source);
             $classTo = $this->parser->getClassDescription($destination);
 
+            //TODO: First merger, and tests and it will all be clearer :)
             $this->mergeClasses($classFrom, $classTo);
 
             $classFrom = [$this->builder->buildFromDescription($classFrom)];
@@ -86,6 +100,10 @@ final class MergeClassProcessor extends AbstractProcessor
             $destination->addProperty($property);
             $source->removeProperty($property);
         }
+
+        // traverse source class for methods
+
+        // traverse destination class for methods
 
         foreach ($source->getMethods() as $name => $method) {
             if ( ! array_key_exists($name, $destination->getMethods())) {

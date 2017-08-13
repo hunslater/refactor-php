@@ -9,6 +9,7 @@ use PhpParser\NodeTraverser;
 use PhpParser\ParserFactory;
 use PhpParser\PrettyPrinter\Standard;
 use RefactorPhp\ClassBuilder;
+use RefactorPhp\ClassMerger;
 use RefactorPhp\Filesystem as RefactorPhpFilesystem;
 use RefactorPhp\Manifest\FindAndReplaceInterface;
 use RefactorPhp\Manifest\FindInterface;
@@ -118,7 +119,8 @@ class ProcessorFactory
             ),
             new ClassBuilder(
                 new BuilderFactory()
-            )
+            ),
+            new ClassMerger()
         );
     }
 }
