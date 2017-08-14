@@ -18,10 +18,6 @@ class ClassDescription
      */
     private $implements = [];
     /**
-     * @var Node\Stmt\TraitUse[]
-     */
-    private $traits = [];
-    /**
      * @var Node\Stmt\ClassConst[]
      */
     private $constants = [];
@@ -44,10 +40,13 @@ class ClassDescription
 
     /**
      * @param string $name
+     * @return $this
      */
     public function setName(string $name)
     {
         $this->name = $name;
+
+        return $this;
     }
 
     /**
@@ -60,10 +59,13 @@ class ClassDescription
 
     /**
      * @param Node\Name $extends
+     * @return $this
      */
     public function setExtends(Node\Name $extends)
     {
         $this->extends = $extends;
+
+        return $this;
     }
 
     /**
@@ -76,10 +78,13 @@ class ClassDescription
 
     /**
      * @param Node\Name $implements
+     * @return $this
      */
     public function addImplements(Node\Name $implements)
     {
         $this->implements[$implements->getFirst()] = $implements;
+
+        return $this;
     }
 
     /**
@@ -88,30 +93,6 @@ class ClassDescription
     public function removeImplements(Node\Name $implements)
     {
         unset($this->implements[$implements->getFirst()]);
-    }
-
-    /**
-     * @return Node\Stmt\TraitUse[]
-     */
-    public function getTraits(): array
-    {
-        return $this->traits;
-    }
-
-    /**
-     * @param Node\Stmt\TraitUse $trait
-     */
-    public function addTrait(Node\Stmt\TraitUse $trait)
-    {
-        $this->traits[$trait->traits[0]->getFirst()] = $trait;
-    }
-
-    /**
-     * @param Node\Stmt\TraitUse $trait
-     */
-    public function removeTrait(Node\Stmt\TraitUse $trait)
-    {
-        unset($this->traits[$trait->traits[0]->getFirst()]);
     }
 
     /**
@@ -124,10 +105,13 @@ class ClassDescription
 
     /**
      * @param Node\Stmt\ClassConst $constant
+     * @return $this
      */
     public function addConstant(Node\Stmt\ClassConst $constant)
     {
         $this->constants[$constant->consts[0]->name] = $constant;
+
+        return $this;
     }
 
     /**
@@ -148,10 +132,13 @@ class ClassDescription
 
     /**
      * @param Node\Stmt\Property $property
+     * @return $this
      */
     public function addProperty(Node\Stmt\Property $property)
     {
         $this->properties[$property->props[0]->name] = $property;
+
+        return $this;
     }
 
     /**
@@ -172,10 +159,13 @@ class ClassDescription
 
     /**
      * @param Node\Stmt\ClassMethod $method
+     * @return $this
      */
     public function addMethod(Node\Stmt\ClassMethod $method)
     {
         $this->methods[strtolower($method->name)] = $method;
+
+        return $this;
     }
 
     /**

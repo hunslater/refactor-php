@@ -1,11 +1,14 @@
 <?php
 namespace RefactorPhp\Processor;
 
+use PhpParser\Node;
 use RefactorPhp\ClassBuilder;
-use RefactorPhp\ClassDescription;
+use RefactorPhp\ClassMerger;
 use RefactorPhp\Filesystem;
 use RefactorPhp\Manifest\MergeClassInterface;
 use RefactorPhp\Node\NodeParser;
+use RefactorPhp\Visitor\MergeExtractedMethodVisitor;
+use RefactorPhp\Visitor\MergeUniqueMethodVisitor;
 
 final class MergeClassProcessor extends AbstractProcessor
 {
@@ -23,6 +26,10 @@ final class MergeClassProcessor extends AbstractProcessor
      * @var ClassBuilder
      */
     protected $builder;
+    /**
+     * @var ClassMerger
+     */
+    private $merger;
 
     /**
      * MergeClassProcessor constructor.
@@ -30,16 +37,27 @@ final class MergeClassProcessor extends AbstractProcessor
      * @param MergeClassInterface $manifest
      * @param Filesystem $fs
      * @param ClassBuilder $builder
+     * @param ClassMerger $merger
      */
-    public function __construct(NodeParser $parser, MergeClassInterface $manifest, Filesystem $fs, ClassBuilder $builder)
+    public function __construct(
+        NodeParser $parser,
+        MergeClassInterface $manifest,
+        Filesystem $fs,
+        ClassBuilder $builder,
+        ClassMerger $merger
+    )
     {
         parent::__construct($parser);
 
         $this->manifest = $manifest;
         $this->fs = $fs;
         $this->builder = $builder;
+        $this->merger = $merger;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function refactor()
     {
         foreach ($this->manifest->getClassMap() as $source => $destination) {
@@ -48,67 +66,35 @@ final class MergeClassProcessor extends AbstractProcessor
                 basename($source),
                 basename($destination)
             ));
-            $classFrom = $this->parser->getClassDescription($source);
-            $classTo = $this->parser->getClassDescription($destination);
 
-            $this->mergeClasses($classFrom, $classTo);
+            $this->merger
+                ->setSourceClass($source)
+                ->setDestinationClass($destination)
+                ->merge();
 
-            $classFrom = [$this->builder->buildFromDescription($classFrom)];
-            $classTo = [$this->builder->buildFromDescription($classTo)];
+            $resultNodes = [$this->builder->buildFromDescription($this->merger->getResultClass())];
 
-            // Temporary path
-            $this->fs->saveNodesToFile($classFrom, $source);
-            $this->output->writeln("Saved file <comment>$source</comment>.");
-            $this->fs->saveNodesToFile($classTo, $destination);
-            $this->output->writeln("Saved file <comment>$destination</comment>.");
+            $this->saveFile($resultNodes, $destination);
+            $this->removeFile($source);
         }
     }
 
     /**
-     * @param ClassDescription $source
-     * @param ClassDescription $destination
+     * @param $nodes Node[]
+     * @param $filename
      */
-    public function mergeClasses(ClassDescription $source, ClassDescription $destination)
+    private function saveFile(array $nodes, string $filename)
     {
-        foreach ($source->getImplements() as $name => $interface) {
-            if ( ! array_key_exists($name, $destination->getImplements())) {
-                $destination->addImplements($interface);
-                $source->removeImplements($interface);
-            }
-        }
+        $this->fs->saveNodesToFile($nodes, $filename);
+        $this->output->writeln("Saved file <comment>$filename</comment>.");
+    }
 
-        foreach ($source->getTraits() as $name => $trait) {
-            if ( ! array_key_exists($name, $destination->getTraits())) {
-                $destination->addTrait($trait);
-                $source->removeTrait($trait);
-            }
-        }
-
-        foreach ($source->getConstants() as $name => $constant) {
-            if ( ! array_key_exists($name, $destination->getConstants())) {
-                $destination->addConstant($constant);
-                $source->removeConstant($constant);
-            }
-        }
-
-        foreach ($source->getProperties() as $name => $property) {
-            if ( ! array_key_exists($name, $destination->getProperties())) {
-                $destination->addProperty($property);
-                $source->removeProperty($property);
-            }
-        }
-
-        foreach ($source->getMethods() as $name => $method) {
-            if ( ! array_key_exists($name, $destination->getMethods())) {
-                $destination->addMethod($method);
-                $source->removeMethod($method);
-            }
-        }
-
-        dump("--- DUPLICATES ---");
-        dump(count($source->getTraits()));
-        dump(count($source->getConstants()));
-        dump(count($source->getProperties()));
-        dump(count($source->getMethods()));
+    /**
+     * @param string $filename
+     */
+    private function removeFile(string $filename)
+    {
+        $this->fs->removeFile($filename);
+        $this->output->writeln("Deleted file <comment>$filename</comment>.");
     }
 }

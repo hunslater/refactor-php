@@ -6,22 +6,34 @@ namespace RefactorPhp\Tests\Manifest;
 use PHPUnit\Framework\TestCase;
 use RefactorPhp\Manifest\FindAndReplaceInterface;
 use RefactorPhp\Manifest\FindInterface;
+use RefactorPhp\Manifest\MergeClassInterface;
 use RefactorPhp\Processor\FindAndReplaceProcessor;
 use RefactorPhp\Processor\FindProcessor;
+use RefactorPhp\Processor\MergeClassProcessor;
 use RefactorPhp\Processor\ProcessorFactory;
 
 class ProcessorFactoryTest extends TestCase
 {
-    public function testCreate()
+    /**
+     * @dataProvider getData
+     * @param $interface
+     * @param $processor
+     */
+    public function testCreate($interface, $processor)
     {
-        $findAndReplaceInterface = $this->createMock(FindAndReplaceInterface::class);
-        $findInterface = $this->createMock(FindInterface::class);
-
         $factory = new ProcessorFactory();
-        $findAndReplaceProcessor = $factory->create($findAndReplaceInterface);
-        $findProcessor = $factory->create($findInterface);
+        $interfaceMock = $this->createMock($interface);
+        $processorObject = $factory->create($interfaceMock);
 
-        $this->assertInstanceOf(FindAndReplaceProcessor::class, $findAndReplaceProcessor);
-        $this->assertInstanceOf(FindProcessor::class, $findProcessor);
+        $this->assertInstanceOf($processor, $processorObject);
+    }
+
+    public function getData()
+    {
+        return [
+            [FindInterface::class, FindProcessor::class],
+            [FindAndReplaceInterface::class, FindAndReplaceProcessor::class],
+            [MergeClassInterface::class, MergeClassProcessor::class],
+        ];
     }
 }

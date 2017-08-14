@@ -9,6 +9,8 @@ use PhpParser\NodeTraverser;
 use PhpParser\ParserFactory;
 use PhpParser\PrettyPrinter\Standard;
 use RefactorPhp\ClassBuilder;
+use RefactorPhp\ClassDescription;
+use RefactorPhp\ClassMerger;
 use RefactorPhp\Filesystem as RefactorPhpFilesystem;
 use RefactorPhp\Manifest\FindAndReplaceInterface;
 use RefactorPhp\Manifest\FindInterface;
@@ -106,11 +108,13 @@ class ProcessorFactory
      */
     private function createMergeClassProcessor(): MergeClassProcessor
     {
+        $parser = new NodeParser(
+            (new ParserFactory())->create(ParserFactory::PREFER_PHP7),
+            new NodeTraverser()
+        );
+
         return new MergeClassProcessor(
-            new NodeParser(
-                (new ParserFactory())->create(ParserFactory::PREFER_PHP7),
-                new NodeTraverser()
-            ),
+            $parser,
             $this->resolver->getManifest(),
             new RefactorPhpFilesystem(
                 new Filesystem(),
@@ -118,7 +122,8 @@ class ProcessorFactory
             ),
             new ClassBuilder(
                 new BuilderFactory()
-            )
+            ),
+            new ClassMerger($parser, new ClassDescription())
         );
     }
 }

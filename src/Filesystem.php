@@ -43,4 +43,11 @@ final class Filesystem
         $this->fs->dumpFile($filename, $code);
     }
 
+    /**
+     * @param string $file
+     */
+    public function removeFile(string $file)
+    {
+        $this->fs->remove($file);
+    }
 }
