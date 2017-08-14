@@ -1,8 +1,8 @@
 <?php
 namespace RefactorPhp\Processor;
 
+use PhpParser\Node;
 use RefactorPhp\ClassBuilder;
-use RefactorPhp\ClassDescription;
 use RefactorPhp\ClassMerger;
 use RefactorPhp\Filesystem;
 use RefactorPhp\Manifest\MergeClassInterface;
@@ -55,6 +55,9 @@ final class MergeClassProcessor extends AbstractProcessor
         $this->merger = $merger;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function refactor()
     {
         foreach ($this->manifest->getClassMap() as $source => $destination) {
@@ -63,62 +66,35 @@ final class MergeClassProcessor extends AbstractProcessor
                 basename($source),
                 basename($destination)
             ));
-            $classFrom = $this->parser->getClassDescription($source);
-            $classTo = $this->parser->getClassDescription($destination);
 
-            //TODO: First merger, and tests and it will all be clearer :)
-            $this->mergeClasses($classFrom, $classTo);
+            $this->merger
+                ->setSourceClass($source)
+                ->setDestinationClass($destination)
+                ->merge();
 
-            $classFrom = [$this->builder->buildFromDescription($classFrom)];
-            $classTo = [$this->builder->buildFromDescription($classTo)];
+            $resultNodes = [$this->builder->buildFromDescription($this->merger->getResultClass())];
 
-            // Temporary path
-            $this->fs->saveNodesToFile($classFrom, $source);
-            $this->output->writeln("Saved file <comment>$source</comment>.");
-            $this->fs->saveNodesToFile($classTo, $destination);
-            $this->output->writeln("Saved file <comment>$destination</comment>.");
+            $this->saveFile($resultNodes, $destination);
+            $this->removeFile($source);
         }
     }
 
     /**
-     * @param ClassDescription $source
-     * @param ClassDescription $destination
+     * @param $nodes Node[]
+     * @param $filename
      */
-    public function mergeClasses(ClassDescription $source, ClassDescription $destination)
+    private function saveFile(array $nodes, string $filename)
     {
-        foreach ($source->getImplements() as $name => $interface) {
-            $destination->addImplements($interface);
-            $source->removeImplements($interface);
-        }
+        $this->fs->saveNodesToFile($nodes, $filename);
+        $this->output->writeln("Saved file <comment>$filename</comment>.");
+    }
 
-        foreach ($source->getConstants() as $name => $constant) {
-            $destination->addConstant($constant);
-            $source->removeConstant($constant);
-        }
-
-        foreach ($source->getProperties() as $name => $property) {
-            $destination->addProperty($property);
-            $source->removeProperty($property);
-        }
-
-        // traverse source class for methods
-
-        // traverse destination class for methods
-
-        foreach ($source->getMethods() as $name => $method) {
-            if ( ! array_key_exists($name, $destination->getMethods())) {
-//                $this->parser->traverseWithVisitor([$method], new MergeUniqueMethodVisitor($source, $destination));
-                $destination->addMethod($method);
-                $source->removeMethod($method);
-            } else {
-                $extractedMethod = $destination->getMethods()[$name];
-                $destination->removeMethod($method);
-                $this->parser->traverseWithVisitor([$extractedMethod], new MergeExtractedMethodVisitor());
-                $destination->addMethod($extractedMethod);
-
-                $destination->addMethod($method);
-                $source->removeMethod($method);
-            }
-        }
+    /**
+     * @param string $filename
+     */
+    private function removeFile(string $filename)
+    {
+        $this->fs->removeFile($filename);
+        $this->output->writeln("Deleted file <comment>$filename</comment>.");
     }
 }

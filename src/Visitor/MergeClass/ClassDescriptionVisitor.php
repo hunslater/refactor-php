@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace RefactorPhp\Visitor;
+namespace RefactorPhp\Visitor\MergeClass;
 
 use PhpParser\Node;
 use PhpParser\NodeTraverser;
@@ -44,9 +44,6 @@ final class ClassDescriptionVisitor extends NodeVisitorAbstract
             return NodeTraverser::REMOVE_NODE;
         } elseif ($node instanceof Node\Stmt\ClassConst) {
             $this->classDescription->addConstant($node);
-            return NodeTraverser::REMOVE_NODE;
-        } elseif ($node instanceof Node\Stmt\TraitUse) {
-            $this->classDescription->addTrait($node);
             return NodeTraverser::REMOVE_NODE;
         }
 

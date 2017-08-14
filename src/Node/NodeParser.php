@@ -11,9 +11,9 @@ use RefactorPhp\ClassDescription;
 use RefactorPhp\Manifest\FindAndReplaceInterface;
 use RefactorPhp\Manifest\NodeManifestInterface;
 use RefactorPhp\Visitor\ApplyManifestVisitor;
-use RefactorPhp\Visitor\ClassDescriptionVisitor;
 use RefactorPhp\Visitor\CreateNodeRelationshipVisitor;
 use RefactorPhp\Visitor\MatchesManifestVisitor;
+use RefactorPhp\Visitor\MergeClass\ClassDescriptionVisitor;
 use Symfony\Component\Finder\SplFileInfo;
 
 final class NodeParser implements NodeParserInterface
