@@ -42,16 +42,6 @@ class ClassDescription
      */
     private $methods = [];
 
-
-    public function reset()
-    {
-        unset($this->namespace);
-        unset($this->name);
-        unset($this->extends);
-
-
-    }
-
     /**
      * @return string
      */
