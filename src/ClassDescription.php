@@ -3,20 +3,16 @@ namespace RefactorPhp;
 
 use PhpParser\Node;
 
-//TODO: Implement use cases as well as interfaces and traits.
-
 class ClassDescription
 {
     /**
      * @var string
      */
     private $namespace;
-
     /**
      * @var
      */
-    private $useCases;
-
+    private $useCases = [];
     /**
      * @var string
      */
@@ -29,7 +25,9 @@ class ClassDescription
      * @var Node\Name[]
      */
     private $implements = [];
-
+    /**
+     * @var
+     */
     private $traits = [];
     /**
      * @var Node\Stmt\ClassConst[]
@@ -43,6 +41,16 @@ class ClassDescription
      * @var Node\Stmt\ClassMethod[]
      */
     private $methods = [];
+
+
+    public function reset()
+    {
+        unset($this->namespace);
+        unset($this->name);
+        unset($this->extends);
+
+
+    }
 
     /**
      * @return string
