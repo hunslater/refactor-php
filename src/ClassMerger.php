@@ -34,12 +34,10 @@ class ClassMerger
     /**
      * ClassMerger constructor.
      * @param NodeParser $parser
-     * @param ClassDescription $resultClass
      */
-    public function __construct(NodeParser $parser, ClassDescription $resultClass)
+    public function __construct(NodeParser $parser)
     {
         $this->parser = $parser;
-        $this->resultClass = $resultClass;
     }
 
     /**
@@ -119,6 +117,7 @@ class ClassMerger
 
     private function initialiseResultClass()
     {
+        $this->resultClass = new ClassDescription();
         $this->resultClass
             ->setName($this->destinationClass->getName())
             ->setExtends($this->destinationClass->getExtends());

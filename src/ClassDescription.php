@@ -8,6 +8,14 @@ class ClassDescription
     /**
      * @var string
      */
+    private $namespace;
+    /**
+     * @var
+     */
+    private $useCases = [];
+    /**
+     * @var string
+     */
     private $name;
     /**
      * @var Node\Name
@@ -17,6 +25,10 @@ class ClassDescription
      * @var Node\Name[]
      */
     private $implements = [];
+    /**
+     * @var
+     */
+    private $traits = [];
     /**
      * @var Node\Stmt\ClassConst[]
      */
@@ -29,6 +41,44 @@ class ClassDescription
      * @var Node\Stmt\ClassMethod[]
      */
     private $methods = [];
+
+    /**
+     * @return string
+     */
+    public function getNamespace(): string
+    {
+        return $this->namespace;
+    }
+
+    /**
+     * @param string $namespace
+     * @return $this
+     */
+    public function setNamespace(string $namespace)
+    {
+        $this->namespace = $namespace;
+
+        return $this;
+    }
+
+    /**
+     * @return Node\Name[]
+     */
+    public function getUseCases(): array
+    {
+        return $this->useCases;
+    }
+
+    /**
+     * @param Node\Name $useCase
+     * @return $this
+     */
+    public function addUseCase(Node\Name $useCase)
+    {
+        $this->useCases[$useCase->getFirst()] = $useCase;
+
+        return $this;
+    }
 
     /**
      * @return string

@@ -123,7 +123,7 @@ class ProcessorFactory
             new ClassBuilder(
                 new BuilderFactory()
             ),
-            new ClassMerger($parser, new ClassDescription())
+            new ClassMerger($parser)
         );
     }
 }
