@@ -46,7 +46,6 @@ final class ClassBuilder
             ->addStmts($description->getProperties())
             ->addStmts($description->getMethods());
 
-        return [$description->getNamespace()] + $description->getUseCases() + [$class->getNode()];
+        return array_filter(array_merge([$description->getNamespace()], $description->getUseCases(), [$class->getNode()]));
     }
-
 }
