@@ -108,6 +108,7 @@ class ClassMerger
 
         foreach ($this->sourceClass->getImplements() as $interface) {
             $this->resultClass->addImplements($interface);
+            $this->sourceClass->removeImplements($interface);
         }
     }
 
@@ -122,6 +123,7 @@ class ClassMerger
 
         foreach ($this->sourceClass->getConstants() as $constant) {
             $this->resultClass->addConstant($constant);
+            $this->sourceClass->removeConstant($constant);
         }
     }
 
@@ -150,6 +152,7 @@ class ClassMerger
 
         foreach ($this->sourceClass->getProperties() as $property) {
             $this->resultClass->addProperty($property);
+            $this->sourceClass->removeProperty($property);
         }
     }
 
@@ -186,6 +189,7 @@ class ClassMerger
 
         foreach ($this->sourceClass->getMethods() as $method) {
             $this->resultClass->addMethod($method);
+            $this->sourceClass->removeMethod($method);
         }
 
         // modify static::call to static::callExtracted if necessary
@@ -215,5 +219,13 @@ class ClassMerger
         }
 
         return $extractedMethodsVisitor->getExtractedMethods();
+    }
+
+    /**
+     * @return ClassDescription
+     */
+    public function getSourceClass(): ClassDescription
+    {
+        return $this->sourceClass;
     }
 }

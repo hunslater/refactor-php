@@ -36,19 +36,23 @@ final class SetParentMethodCallsVisitor extends NodeVisitorAbstract
             $node->class->getFirst() === 'parent' &&
             in_array(strtolower($node->name), $this->extractedMethods)
         ) {
+            $args = $node->args;
             $node = new Node\Expr\MethodCall(
                 new Node\Expr\Variable('this'),
                 $node->name.'Extracted'
             );
+            $node->args = $args;
         } elseif (
             $node instanceof StaticCall &&
             $node->class->getFirst() === 'parent' &&
             in_array(strtolower($node->name), $this->destinationMethods)
         ) {
+            $args = $node->args;
             $node = new Node\Expr\MethodCall(
                 new Node\Expr\Variable('this'),
                 $node->name
             );
+            $node->args = $args;
         }
 
         return $node;

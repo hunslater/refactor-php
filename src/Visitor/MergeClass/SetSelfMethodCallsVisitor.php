@@ -33,10 +33,12 @@ final class SetSelfMethodCallsVisitor extends NodeVisitorAbstract
             $node->class->getFirst() === 'static' &&
             in_array(strtolower($node->name), $this->extractedMethods)
         ) {
+            $args = $node->args;
             $node = new Node\Expr\StaticCall(
                 new Node\Name('static'),
                 $node->name.'Extracted'
             );
+            $node->args = $args;
         }
 
         return $node;
