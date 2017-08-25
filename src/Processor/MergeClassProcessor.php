@@ -72,8 +72,8 @@ final class MergeClassProcessor extends AbstractProcessor
                 ->setDestinationClass($destination)
                 ->merge();
 
-            $sourceNodes = [$this->builder->buildFromDescription($this->merger->getSourceClass())];
-            $resultNodes = [$this->builder->buildFromDescription($this->merger->getResultClass())];
+            $sourceNodes = $this->builder->buildFromDescription($this->merger->getSourceClass());
+            $resultNodes = $this->builder->buildFromDescription($this->merger->getResultClass());
 
             $this->saveFile($resultNodes, $destination);
             $this->saveFile($sourceNodes, $source);

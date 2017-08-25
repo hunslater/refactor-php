@@ -24,9 +24,9 @@ final class ClassBuilder
 
     /**
      * @param ClassDescription $description
-     * @return Class_
+     * @return array
      */
-    public function buildFromDescription(ClassDescription $description): Class_
+    public function buildFromDescription(ClassDescription $description): array
     {
         $class = $this->builder->class($description->getName());
 
@@ -41,11 +41,12 @@ final class ClassBuilder
         }
 
         $class
+            ->addStmts($description->getTraits())
             ->addStmts($description->getConstants())
             ->addStmts($description->getProperties())
             ->addStmts($description->getMethods());
 
-        return $class->getNode();
+        return [$description->getNamespace()] + $description->getUseCases() + [$class->getNode()];
     }
 
 }

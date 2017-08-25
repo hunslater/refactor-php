@@ -5,7 +5,6 @@ namespace RefactorPhp;
 
 use RefactorPhp\Node\NodeParser;
 use RefactorPhp\Visitor\MergeClass\DetermineExtractedMethodsVisitor;
-use RefactorPhp\Visitor\MergeClass\GetDestinationMethodsVisitor;
 use RefactorPhp\Visitor\MergeClass\SetParentMethodCallsVisitor;
 use RefactorPhp\Visitor\MergeClass\SetSelfMethodCallsVisitor;
 
@@ -62,10 +61,15 @@ class ClassMerger
         return $this;
     }
 
+    /**
+     * Merges two class structures.
+     */
     public function merge()
     {
         $this->initialiseResultClass();
+        $this->mergeUseCases();
         $this->mergeInterfaces();
+        $this->mergeTraits();
         $this->mergeConstants();
         $this->mergeProperties();
         $this->mergeMethods();
@@ -79,6 +83,23 @@ class ClassMerger
         return $this->resultClass;
     }
 
+    /**
+     * Merges class USE statements.
+     */
+    private function mergeUseCases()
+    {
+        foreach ($this->destinationClass->getUseCases() as $useCase) {
+            $this->resultClass->addUseCase($useCase);
+        }
+
+        foreach ($this->sourceClass->getUseCases() as $useCase) {
+            $this->resultClass->addUseCase($useCase);
+        }
+    }
+
+    /**
+     * Merges class IMPLEMENTS statements.
+     */
     private function mergeInterfaces()
     {
         foreach ($this->destinationClass->getImplements() as $interface) {
@@ -91,6 +112,9 @@ class ClassMerger
         }
     }
 
+    /**
+     * Merges class CONST statements.
+     */
     private function mergeConstants()
     {
         foreach ($this->destinationClass->getConstants() as $constant) {
@@ -103,6 +127,23 @@ class ClassMerger
         }
     }
 
+    /**
+     * Merges class USE TRAIT statements.
+     */
+    private function mergeTraits()
+    {
+        foreach ($this->destinationClass->getTraits() as $trait) {
+            $this->resultClass->addTrait($trait);
+        }
+
+        foreach ($this->sourceClass->getTraits() as $trait) {
+            $this->resultClass->addTrait($trait);
+        }
+    }
+
+    /**
+     * Merges class properties.
+     */
     private function mergeProperties()
     {
         foreach ($this->destinationClass->getProperties() as $property) {
@@ -115,14 +156,26 @@ class ClassMerger
         }
     }
 
+    /**
+     * Creates new result class description.
+     */
     private function initialiseResultClass()
     {
         $this->resultClass = new ClassDescription();
-        $this->resultClass
-            ->setName($this->destinationClass->getName())
-            ->setExtends($this->destinationClass->getExtends());
+        $this->resultClass->setName($this->destinationClass->getName());
+
+        if (null !== $namespace = $this->sourceClass->getNamespace()) {
+            $this->resultClass->setNamespace($namespace);
+        }
+
+        if (null !== $extends = $this->destinationClass->getExtends()) {
+            $this->resultClass->setExtends($extends);
+        }
     }
 
+    /**
+     * Merges class methods.
+     */
     private function mergeMethods()
     {
         $destinationMethods = array_keys($this->destinationClass->getMethods());

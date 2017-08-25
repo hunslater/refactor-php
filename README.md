@@ -5,6 +5,8 @@ PHP Refactor tool
 [![Packagist](https://img.shields.io/packagist/v/phparty/refactor-php.svg)](https://packagist.org/packages/phparty/refactor-php)
 [![Github All Releases](https://img.shields.io/github/downloads/phparty/refactor-php/total.svg)]()
 
+> This project is still experimental. Use at your own risk and backup your files.
+
 The PHP Refactor tool is here to address your needs to refactor significant amounts
 of code at once. 
 

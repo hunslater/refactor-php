@@ -97,18 +97,13 @@ final class NodeParser implements NodeParserInterface
         $file = new SplFileInfo($filename, $filename, $filename);
         $nodes = $this->getFileNodes($file, false);
 
-        if (count($nodes) !== 1) {
-            throw new \LogicException(sprintf(
-                "Provided file %s contains non-class definitions.",
-                basename($filename)
-            ));
-        }
-
-        if ( ! $nodes[0] instanceof Node\Stmt\Class_) {
-            throw new \LogicException(sprintf(
-                "Unable to find class definition in %s.",
-                basename($filename)
-            ));
+        foreach ($nodes as $node) {
+            if (! ($node instanceof Node\Stmt\Class_ || $node instanceof Node\Stmt\Use_ || $node instanceof Node\Stmt\InlineHTML || $node instanceof Node\Stmt\Namespace_)) {
+                throw new \LogicException(sprintf(
+                    "Provided file %s contains non-class definitions.",
+                    basename($filename)
+                ));
+            }
         }
 
         return $nodes;

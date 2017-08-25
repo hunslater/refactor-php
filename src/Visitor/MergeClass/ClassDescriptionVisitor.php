@@ -30,7 +30,11 @@ final class ClassDescriptionVisitor extends NodeVisitorAbstract
      */
     public function leaveNode(Node $node)
     {
-        if ($node instanceof Node\Stmt\Class_) {
+        if ($node instanceof Node\Stmt\Namespace_) {
+            $this->classDescription->setNamespace($node);
+        } elseif ($node instanceof Node\Stmt\Use_) {
+            $this->classDescription->addUseCase($node);
+        } elseif ($node instanceof Node\Stmt\Class_) {
             $this->classDescription->setName($node->name);
             $this->classDescription->setExtends($node->extends);
             foreach ($node->implements as $interface) {
@@ -44,6 +48,9 @@ final class ClassDescriptionVisitor extends NodeVisitorAbstract
             return NodeTraverser::REMOVE_NODE;
         } elseif ($node instanceof Node\Stmt\ClassConst) {
             $this->classDescription->addConstant($node);
+            return NodeTraverser::REMOVE_NODE;
+        } elseif ($node instanceof Node\Stmt\Trait_) {
+            $this->classDescription->addTrait($node);
             return NodeTraverser::REMOVE_NODE;
         }
 

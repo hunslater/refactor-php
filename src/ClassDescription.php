@@ -1,16 +1,21 @@
 <?php
+declare(strict_types=1);
+
 namespace RefactorPhp;
 
 use PhpParser\Node;
+use PhpParser\Node\Stmt\Namespace_;
+use PhpParser\Node\Stmt\Trait_;
+use PhpParser\Node\Stmt\Use_;
 
 class ClassDescription
 {
     /**
-     * @var string
+     * @var Namespace_|null
      */
     private $namespace;
     /**
-     * @var
+     * @var Use_[]
      */
     private $useCases = [];
     /**
@@ -43,18 +48,18 @@ class ClassDescription
     private $methods = [];
 
     /**
-     * @return string
+     * @return Namespace_|null
      */
-    public function getNamespace(): string
+    public function getNamespace()
     {
         return $this->namespace;
     }
 
     /**
-     * @param string $namespace
+     * @param Namespace_ $namespace
      * @return $this
      */
-    public function setNamespace(string $namespace)
+    public function setNamespace(Namespace_ $namespace)
     {
         $this->namespace = $namespace;
 
@@ -62,7 +67,7 @@ class ClassDescription
     }
 
     /**
-     * @return Node\Name[]
+     * @return Use_[]
      */
     public function getUseCases(): array
     {
@@ -70,12 +75,12 @@ class ClassDescription
     }
 
     /**
-     * @param Node\Name $useCase
+     * @param Use_ $useCase
      * @return $this
      */
-    public function addUseCase(Node\Name $useCase)
+    public function addUseCase(Use_ $useCase)
     {
-        $this->useCases[$useCase->getFirst()] = $useCase;
+        $this->useCases[$useCase->uses[0]->alias] = $useCase;
 
         return $this;
     }
@@ -143,6 +148,33 @@ class ClassDescription
     public function removeImplements(Node\Name $implements)
     {
         unset($this->implements[$implements->getFirst()]);
+    }
+
+    /**
+     * @return Trait_[]
+     */
+    public function getTraits(): array
+    {
+        return $this->traits;
+    }
+
+    /**
+     * @param Trait_ $trait
+     * @return $this
+     */
+    public function addTrait(Trait_ $trait)
+    {
+        $this->traits[$trait->name] = $trait;
+
+        return $this;
+    }
+
+    /**
+     * @param Trait_ $trait
+     */
+    public function removeTrait(Trait_ $trait)
+    {
+        unset($this->implements[$trait->name]);
     }
 
     /**
