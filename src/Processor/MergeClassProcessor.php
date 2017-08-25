@@ -72,10 +72,11 @@ final class MergeClassProcessor extends AbstractProcessor
                 ->setDestinationClass($destination)
                 ->merge();
 
+            $sourceNodes = $this->builder->buildFromDescription($this->merger->getSourceClass());
             $resultNodes = $this->builder->buildFromDescription($this->merger->getResultClass());
 
             $this->saveFile($resultNodes, $destination);
-            $this->removeFile($source);
+            $this->saveFile($sourceNodes, $source);
         }
     }
 
@@ -87,14 +88,5 @@ final class MergeClassProcessor extends AbstractProcessor
     {
         $this->fs->saveNodesToFile($nodes, $filename);
         $this->output->writeln("Saved file <comment>$filename</comment>.");
-    }
-
-    /**
-     * @param string $filename
-     */
-    private function removeFile(string $filename)
-    {
-        $this->fs->removeFile($filename);
-        $this->output->writeln("Deleted file <comment>$filename</comment>.");
     }
 }
