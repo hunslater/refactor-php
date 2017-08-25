@@ -3,7 +3,7 @@ PHP Refactor tool
 
 [![Travis](https://img.shields.io/travis/phparty/refactor-php.svg)]()
 [![Packagist](https://img.shields.io/packagist/v/phparty/refactor-php.svg)](https://packagist.org/packages/phparty/refactor-php)
-[![Github All Releases](https://img.shields.io/github/downloads/phparty/refactor-php/total.svg)]()
+[![Github All Releases](https://img.shields.io/packagist/dt/phparty/refactor-php.svg)]()
 
 > This project is still experimental. Use at your own risk and backup your files.
 
