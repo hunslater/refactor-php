@@ -7,6 +7,7 @@ use RefactorPhp\Finder;
 use RefactorPhp\Manifest\FindAndReplaceInterface;
 use RefactorPhp\Node\NodeParser;
 use RefactorPhp\Filesystem;
+use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * Class RefactorProcessor.
@@ -55,6 +56,11 @@ final class FindAndReplaceProcessor extends AbstractProcessor
     public function refactor()
     {
         foreach ($this->finder as $file) {
+
+            if ($this->output->getVerbosity() === OutputInterface::VERBOSITY_VERBOSE) {
+                $this->output->writeln("<info>Processing {$file->getFilename()} ...</info>");
+            }
+
             $nodes = $this->parser->getFileNodes($file);
             if ($this->parser->matchesManifest($nodes, $this->manifest)) {
                 $this->output->writeln("<comment>Found {$file->getFilename()} matches manifest rules.</comment>");
