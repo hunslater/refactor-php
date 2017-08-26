@@ -180,14 +180,20 @@ class ClassDescriptionTest extends TestCase
         return [
             [
                 new ClassMethod(
-                    Class_::MODIFIER_PRIVATE,
-                    [new Return_(new LNumber(5))]
+                    'Foo',
+                    [
+                        'flags' => Class_::MODIFIER_PRIVATE,
+                        'stmts' => [new Return_(new LNumber(5))],
+                    ]
                 )
             ],
             [
                 new ClassMethod(
-                    Class_::MODIFIER_STATIC|Class_::MODIFIER_PUBLIC,
-                    [new PropertyProperty('Bar', new Array_([0,1,3]))]
+                    'Bar',
+                    [
+                        'flags' => Class_::MODIFIER_STATIC|Class_::MODIFIER_PUBLIC,
+                        'stmts' => [new PropertyProperty('Bar', new Array_([0,1,3]))],
+                    ]
                 )
             ],
         ];
