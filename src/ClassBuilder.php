@@ -28,6 +28,7 @@ final class ClassBuilder
      */
     public function buildFromDescription(ClassDescription $description): array
     {
+        $nodes = [];
         $class = $this->builder->class($description->getName());
 
         if ($extend = $description->getExtends()) {
@@ -46,6 +47,20 @@ final class ClassBuilder
             ->addStmts($description->getProperties())
             ->addStmts($description->getMethods());
 
-        return array_filter(array_merge([$description->getNamespace()], $description->getUseCases(), [$class->getNode()]));
+        if (null !== $namespace = $description->getNamespace()) {
+            $builtNamespace = $this->builder->namespace($namespace->name->getFirst());
+            $nodes[] = $builtNamespace->getNode();
+        }
+
+        if ($uses = $description->getUseCases()) {
+            foreach ($uses as $use) {
+                $builtUse = $this->builder->use($use->uses[0]->name->getFirst());
+                $nodes[] = $builtUse->getNode();
+            }
+        }
+
+        $nodes[] = $class->getNode();
+
+        return $nodes;
     }
 }
