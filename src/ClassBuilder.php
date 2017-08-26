@@ -54,8 +54,7 @@ final class ClassBuilder
 
         if ($uses = $description->getUseCases()) {
             foreach ($uses as $use) {
-                $builtUse = $this->builder->use($use->uses[0]->name->getFirst());
-                $nodes[] = $builtUse->getNode();
+                $nodes[] = $use;
             }
         }
 
