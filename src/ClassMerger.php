@@ -199,7 +199,9 @@ class ClassMerger
         }
 
         foreach ($this->destinationClass->getMethods() as $method) {
-            $this->resultClass->addMethod($method);
+            if (!$this->resultClass->hasMethod($method)) {
+                $this->resultClass->addMethod($method);
+            }
         }
     }
 
