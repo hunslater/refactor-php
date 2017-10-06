@@ -257,4 +257,13 @@ class ClassDescription
     {
         unset($this->methods[strtolower($method->name)]);
     }
+    
+    /**
+     * @param Node\Stmt\ClassMethod $method
+     * @return bool
+     */
+    public function hasMethod(Node\Stmt\ClassMethod $method)
+    {
+        return array_key_exists(strtolower($method->name), $this->methods);
+    }
 }
