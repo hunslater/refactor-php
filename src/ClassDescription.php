@@ -245,9 +245,7 @@ class ClassDescription
      */
     public function addMethod(Node\Stmt\ClassMethod $method)
     {
-        if(!array_key_exists(strtolower($method->name), $this->methods)){
-            $this->methods[strtolower($method->name)] = $method;
-        }
+        $this->methods[strtolower($method->name)] = $method;
 
         return $this;
     }
