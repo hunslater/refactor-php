@@ -105,9 +105,9 @@ class ClassDescription
     }
 
     /**
-     * @return Node\Name
+     * @return Node\Name|null
      */
-    public function getExtends(): Node\Name
+    public function getExtends()
     {
         return $this->extends;
     }
