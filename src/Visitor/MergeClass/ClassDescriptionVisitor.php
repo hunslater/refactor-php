@@ -35,11 +35,17 @@ final class ClassDescriptionVisitor extends NodeVisitorAbstract
         } elseif ($node instanceof Node\Stmt\Use_) {
             $this->classDescription->addUseCase($node);
         } elseif ($node instanceof Node\Stmt\Class_) {
+            
             $this->classDescription->setName($node->name);
-            $this->classDescription->setExtends($node->extends);
+            
+            if ($node->extends instanceof Node\Name) {
+                $this->classDescription->setExtends($node->extends);
+            }
+            
             foreach ($node->implements as $interface) {
                 $this->classDescription->addImplements($interface);
             }
+            
         } elseif ($node instanceof Node\Stmt\ClassMethod) {
             $this->classDescription->addMethod($node);
             return NodeTraverser::REMOVE_NODE;
